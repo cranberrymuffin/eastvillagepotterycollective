@@ -9,7 +9,7 @@ page.insertAdjacentHTML(
       Menu
     </button>
     <div class="nav-links" id="nav-links">
-      <a href="index.html" data-page="index.html">Home</a>
+      <a href="/" data-page="index.html">Home</a>
       <a href="about.html" data-page="about.html">About</a>
       <a href="membership.html" data-page="membership.html">Membership</a>
     </div>
