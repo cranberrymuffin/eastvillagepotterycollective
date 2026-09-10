@@ -1,6 +1,12 @@
 const page = document.querySelector(".page");
 const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
+const favicon = document.createElement("link");
+favicon.rel = "icon";
+favicon.href = "favicon.svg";
+favicon.type = "image/svg+xml";
+document.head.appendChild(favicon);
+
 page.insertAdjacentHTML(
   "afterbegin",
   `<nav class="site-nav" aria-label="Main navigation">
