@@ -129,6 +129,16 @@ body {
   line-height: 1.35;
 }
 
+.about-origin {
+  margin: 1.25rem 0 0;
+  color: var(--peach);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .about-layout {
   display: grid;
   grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.4fr);
