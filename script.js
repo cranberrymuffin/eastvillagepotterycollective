@@ -1,11 +1,6 @@
 const page = document.querySelector(".page");
-const currentPage = window.location.pathname.split("/").pop() || "index.html";
-
-const favicon = document.createElement("link");
-favicon.rel = "icon";
-favicon.href = "favicon.svg";
-favicon.type = "image/svg+xml";
-document.head.appendChild(favicon);
+const pathname = window.location.pathname;
+const currentPage = pathname.endsWith("/") ? pathname : `${pathname}/`;
 
 const menuToggle = document.querySelector(".menu-toggle");
 const siteNav = document.querySelector(".site-nav");
