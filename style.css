@@ -122,6 +122,13 @@ body {
   color: var(--peach);
 }
 
+.about-section h1 {
+  max-width: none;
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
+  line-height: 0.98;
+  white-space: nowrap;
+}
+
 .about-intro {
   max-width: 38rem;
   margin: 0;
@@ -249,13 +256,21 @@ body {
 }
 
 h1 {
-  max-width: 9ch;
   margin: 0;
   font-size: clamp(3rem, 7vw, 5.7rem);
   font-weight: 400;
   line-height: 0.92;
   letter-spacing: -0.04em;
   text-wrap: balance;
+}
+
+.studio-intro h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1;
+}
+
+.studio-intro {
+  border-bottom: 1px solid var(--line);
 }
 
 .details {
@@ -491,5 +506,8 @@ h1 {
   }
   .membership-header h1 {
     max-width: 10ch;
+  }
+  .about-section h1 {
+    white-space: normal;
   }
 }
