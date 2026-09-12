@@ -3,6 +3,7 @@
   --muted: #a28c80;
   --paper: #e4d4bb;
   --awning-red: #9a5c49;
+  --background: #efe99a;
   --clay: #c7641d;
   --clay-dark: #82482d;
   --line: rgba(48, 38, 34, 0.2);
@@ -32,7 +33,7 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 0 1.25rem 2rem;
-  background: var(--awning-red);
+  background: var(--background);
 }
 
 .site-nav {
