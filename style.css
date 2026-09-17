@@ -148,51 +148,7 @@ body {
 }
 
 .about-layout {
-  display: grid;
-  grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.4fr);
-  gap: clamp(2rem, 5vw, 5rem);
-  align-items: start;
   margin-top: 3rem;
-}
-
-.about-layout .studio-gallery {
-  grid-column: 2;
-  grid-row: 1;
-  margin-top: 0;
-}
-
-.studio-features {
-  grid-column: 1;
-  grid-row: 1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: rgba(248, 241, 230, 0.35);
-}
-
-.studio-features li {
-  display: flex;
-  min-height: 7rem;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem;
-  background: var(--green);
-}
-
-.studio-features strong {
-  color: var(--peach);
-  font-family: "Trebuchet MS", sans-serif;
-  font-size: 1.4rem;
-}
-
-.studio-features span {
-  max-width: 10rem;
-  font-family: "Trebuchet MS", sans-serif;
-  font-size: 0.78rem;
-  line-height: 1.35;
 }
 
 .studio-gallery {
@@ -330,11 +286,6 @@ h1 {
 .email-link:hover,
 .email-link:focus-visible {
   color: var(--clay-dark);
-}
-
-.phone-link {
-  display: block;
-  margin-top: 0.75rem;
 }
 
 .footer-note {
@@ -482,17 +433,8 @@ h1 {
   .contact-card {
     min-height: 0;
   }
-  .studio-features {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .about-layout {
-    grid-template-columns: 1fr;
     gap: 3rem;
-  }
-  .about-layout .studio-gallery,
-  .studio-features {
-    grid-column: auto;
-    grid-row: auto;
   }
   .studio-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
