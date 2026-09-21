@@ -152,14 +152,16 @@ body {
 }
 
 .studio-gallery {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
   margin-top: 3rem;
 }
 
 .studio-gallery figure {
   margin: 0;
+  flex: 0 1 calc((100% - 2rem) / 3);
 }
 
 .studio-gallery img {
@@ -437,8 +439,10 @@ h1 {
     gap: 3rem;
   }
   .studio-gallery {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem 0.75rem;
+  }
+  .studio-gallery figure {
+    flex-basis: calc((100% - 0.75rem) / 2);
   }
   .contact-content {
     grid-template-columns: 1fr;
