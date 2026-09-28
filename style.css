@@ -873,6 +873,144 @@ piece-fields {
 }
 
 
+/* Members home: posts */
+
+.byline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.byline strong {
+  font-weight: 700;
+}
+
+.byline-pronouns {
+  color: var(--muted);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.75rem;
+}
+
+.byline-tag {
+  padding: 0.05rem 0.35rem;
+  background: var(--green);
+  color: var(--white);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.post-composer {
+  margin-bottom: 2rem;
+}
+
+.feed,
+.comment-list,
+.event-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.post {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.1rem 1.25rem;
+  border-left: 3px solid var(--peach);
+  background: rgba(228, 212, 187, 0.45);
+}
+
+.post-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+}
+
+.post-time {
+  color: var(--muted);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.75rem;
+}
+
+.post-body {
+  margin: 0 !important;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.post-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem;
+}
+
+.like-button {
+  text-decoration: none;
+}
+
+.like-button.is-liked {
+  color: var(--awning-red);
+}
+
+.post-comments {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  padding: 0.9rem 0 0 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.comment {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.comment .link-button {
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.75rem;
+}
+
+.comment-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.comment-form input {
+  flex: 1 1 14rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  background: #fffaf2;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.comment-form .form-status {
+  flex-basis: 100%;
+}
+
+.post-edit {
+  max-width: none;
+}
+
+.post-edit textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  background: #fffaf2;
+  font: inherit;
+}
+
 @media (max-width: 680px) {
   .page {
     padding: 0 1rem 1rem;
