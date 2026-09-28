@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>My account | East Village Pottery Collective</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css?v=8" />
+  </head>
+  <body>
+    <main class="page membership-page">
+      <site-nav></site-nav>
+      <article class="membership-card">
+        <header class="membership-header">
+          <p class="contact-label">East Village Pottery Collective</p>
+          <h1>My account</h1>
+        </header>
+
+        <p class="agreement-section form-status" id="page-status" hidden></p>
+
+        <div id="account-view" hidden>
+          <section class="agreement-section" aria-labelledby="profile-heading">
+            <h2 id="profile-heading">Profile</h2>
+            <form class="member-form" id="profile-form">
+              <label class="field">
+                <span>Name</span>
+                <input
+                  type="text"
+                  name="full_name"
+                  autocomplete="name"
+                  maxlength="100"
+                  required
+                />
+              </label>
+              <label class="field">
+                <span>Pronouns</span>
+                <input
+                  type="text"
+                  name="pronouns"
+                  maxlength="50"
+                  placeholder="e.g. she/her, he/him, they/them"
+                />
+              </label>
+              <label class="field">
+                <span>Bio</span>
+                <textarea name="bio" rows="4" maxlength="1000"></textarea>
+              </label>
+              <button class="button" type="submit">Save profile</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section
+            class="agreement-section"
+            aria-labelledby="membership-heading"
+          >
+            <h2 id="membership-heading">Membership</h2>
+            <form class="member-form" id="tier-form">
+              <tier-picker name="tier" required></tier-picker>
+              <button class="button" type="submit">Save tier</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="payment-heading">
+            <h2 id="payment-heading">Payment</h2>
+            <p class="payment-status" id="payment-status" hidden></p>
+            <form class="member-form" id="payment-form">
+              <payment-fields legend="How you pay"></payment-fields>
+              <button class="button" type="submit">Save payment details</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="email-heading">
+            <h2 id="email-heading">Email</h2>
+            <form class="member-form" id="email-form">
+              <label class="field">
+                <span>Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  required
+                />
+              </label>
+              <button class="button" type="submit">Change email</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section
+            class="agreement-section"
+            id="password"
+            aria-labelledby="password-heading"
+          >
+            <h2 id="password-heading">Password</h2>
+            <form class="member-form" id="password-form">
+              <label class="field">
+                <span>New password (at least 8 characters)</span>
+                <input
+                  type="password"
+                  name="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <label class="field">
+                <span>Confirm new password</span>
+                <input
+                  type="password"
+                  name="confirm"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <button class="button" type="submit">Save password</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="/components/site-nav.js?v=1"></script>
+    <script type="module" src="/members/account/account.js?v=2"></script>
+  </body>
+</html>
