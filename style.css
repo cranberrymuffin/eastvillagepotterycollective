@@ -683,6 +683,48 @@ h1 {
   outline-offset: 1px;
 }
 
+.checkbox {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.checkbox input {
+  margin: 0.2rem 0 0;
+  accent-color: var(--green);
+}
+
+.payment-preview {
+  margin: 0 !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem !important;
+}
+
+.payment-preview a {
+  color: var(--ink);
+  text-decoration-color: var(--peach);
+  text-underline-offset: 0.25rem;
+}
+
+.payment-status {
+  display: inline-block;
+  margin: 0 0 1.5rem !important;
+  padding: 0.35rem 0.7rem;
+  background: rgba(154, 92, 73, 0.12);
+  color: var(--awning-red) !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.8rem !important;
+}
+
+.payment-status.is-verified {
+  background: rgba(86, 134, 109, 0.15);
+  color: var(--green) !important;
+  font-weight: 700;
+}
+
 .button-quiet {
   padding: 0.5rem 0.9rem;
   border: 1px solid var(--line);
