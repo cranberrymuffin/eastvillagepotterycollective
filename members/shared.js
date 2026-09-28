@@ -88,3 +88,64 @@ export const authErrorMessage = (error) => {
   }
   return "Something went wrong. Please try again.";
 };
+
+// For pages only members can see: calls onMember(user) once the login is
+// confirmed, and sends anyone else to the login form.
+export const requireMember = (onMember) => {
+  let started = false;
+  supabase.auth.onAuthStateChange((_event, session) => {
+    // Defer so Supabase calls made in response don't deadlock the auth lock.
+    setTimeout(async () => {
+      announceAuthChange();
+      if (!session) {
+        window.location.replace("/members/");
+        return;
+      }
+      if (started) return;
+      started = true;
+      if (await verifySession()) onMember(session.user);
+    });
+  });
+};
+
+// Other members' names (not emails or payment details), keyed by id.
+export const loadMemberNames = async (ids) => {
+  const unique = [...new Set(ids)];
+  if (!unique.length) return new Map();
+  const { data, error } = await supabase
+    .from("member_names")
+    .select("id, full_name, pronouns, is_admin")
+    .in("id", unique);
+  if (error) console.error(error);
+  return new Map((data ?? []).map((member) => [member.id, member]));
+};
+
+export const memberName = (member) => member?.full_name || "A member";
+
+export const el = (tag, className, text) => {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text != null) node.textContent = text;
+  return node;
+};
+
+// "Sep 27, 3:04 PM", with the year only when it isn't this year.
+export const formatWhen = (iso) => {
+  const date = new Date(iso);
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    ...(date.getFullYear() !== new Date().getFullYear() && { year: "numeric" }),
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+// A member's name with their pronouns and a "Studio" tag for admins.
+export const renderByline = (member) => {
+  const byline = el("span", "byline");
+  byline.append(el("strong", null, memberName(member)));
+  if (member?.pronouns) byline.append(el("span", "byline-pronouns", member.pronouns));
+  if (member?.is_admin) byline.append(el("span", "byline-tag", "Studio"));
+  return byline;
+};
