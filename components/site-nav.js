@@ -121,6 +121,7 @@ class SiteNav extends HTMLElement {
       ? [
           ["/members/", "Home"],
           ["/members/invoices/", "Invoices"],
+          ["/members/kiln/", "Kiln"],
           ["/members/admin/", "Members"],
           ["/members/account/", "Account settings"],
         ]

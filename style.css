@@ -845,6 +845,12 @@ piece-fields {
   text-transform: uppercase;
 }
 
+.piece-status.status-in_kiln {
+  background: var(--clay);
+  color: var(--white);
+}
+
+.piece-status.status-ready_for_pickup,
 .piece-status.status-bisque_fired {
   background: var(--green);
   color: var(--white);
@@ -1459,6 +1465,37 @@ piece-fields {
   margin-left: auto;
   font-family: "Trebuchet MS", sans-serif;
   font-size: 0.8rem;
+}
+
+/* Kiln page */
+
+.kiln-stage-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.kiln-stage-heading h2 {
+  margin: 0 !important;
+}
+
+.kiln-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.kiln-piece {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--peach);
+  background: rgba(228, 212, 187, 0.45);
 }
 
 @media (max-width: 680px) {

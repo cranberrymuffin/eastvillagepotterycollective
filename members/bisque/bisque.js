@@ -7,7 +7,7 @@ import {
   withForm,
   el,
 } from "../shared.js?v=3";
-import { formatVolume, formatPieceNumber } from "../studio.js?v=3";
+import { formatVolume, formatPieceNumber, PIECE_STATUSES } from "../studio.js?v=4";
 import "../components/piece-fields.js";
 
 const BUCKET = "piece-photos";
@@ -104,11 +104,6 @@ pieceForm.addEventListener("submit", async (event) => {
 
 // Listing pieces -----------------------------------------------------------
 
-const STATUS_LABELS = {
-  submitted: "Waiting for bisque",
-  bisque_fired: "Bisque fired",
-};
-
 const renderPiece = (piece, photoUrls) => {
   const item = el("li", "piece");
 
@@ -135,7 +130,7 @@ const renderPiece = (piece, photoUrls) => {
   title.append(el("h3", null, piece.title));
   heading.append(
     title,
-    el("span", `piece-status status-${piece.status}`, STATUS_LABELS[piece.status]),
+    el("span", `piece-status status-${piece.status}`, PIECE_STATUSES[piece.status] ?? piece.status),
   );
   body.append(heading);
 

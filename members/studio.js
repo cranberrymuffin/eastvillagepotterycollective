@@ -48,3 +48,11 @@ export const formatPlainDate = (date, month = "long") => {
 };
 
 export const formatPieceNumber = (number) => `#${String(number).padStart(4, "0")}`;
+
+// A piece's journey through the bisque kiln (pieces.status). The studio
+// moves pieces along on the Kiln page.
+export const PIECE_STATUSES = {
+  submitted: "Ready for bisque",
+  in_kiln: "In the kiln",
+  ready_for_pickup: "Ready for pickup",
+};
