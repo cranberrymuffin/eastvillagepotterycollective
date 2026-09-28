@@ -98,7 +98,8 @@ class SiteNav extends HTMLElement {
     signOut.addEventListener("click", async () => {
       // Loaded on demand so public pages don't pull in the Supabase library.
       const { supabase } = await import("/members/shared.js");
-      await supabase?.auth.signOut();
+      // "local" ends only this browser's login, not the member's other devices.
+      await supabase?.auth.signOut({ scope: "local" });
       window.location.assign("/members/");
     });
     submenu.append(
