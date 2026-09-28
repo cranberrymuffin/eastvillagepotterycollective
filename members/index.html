@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Members | East Village Pottery Collective</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css?v=6" />
+  </head>
+  <body>
+    <main class="page membership-page">
+      <nav class="site-nav" aria-label="Main navigation">
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="nav-links"
+        >
+          <span class="menu-icon" aria-hidden="true"
+            ><span></span><span></span><span></span
+          ></span>
+          Menu
+        </button>
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/about/">About</a>
+          <a href="/membership/">Membership</a>
+          <a href="/members/" aria-current="page">Login</a>
+        </div>
+      </nav>
+      <article class="membership-card">
+        <header class="membership-header">
+          <p class="contact-label">East Village Pottery Collective</p>
+          <h1>Members</h1>
+          <p class="membership-lede">
+            This is the members-only portal for East Village Pottery Collective.
+          </p>
+        </header>
+
+        <p class="agreement-section form-status" id="page-status" hidden></p>
+
+        <section
+          class="agreement-section"
+          id="login-view"
+          aria-labelledby="login-heading"
+          hidden
+        >
+          <h2 id="login-heading">Log in</h2>
+          <form class="member-form" id="login-form">
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label class="field">
+              <span>Password</span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+            <button class="button" type="submit">Log in</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+            <button
+              class="link-button"
+              type="button"
+              id="resend-confirmation"
+              hidden
+            >
+              Resend confirmation email
+            </button>
+            <p class="auth-options">
+              <button class="link-button" type="button" id="forgot-password">
+                Forgot password?
+              </button>
+            </p>
+          </form>
+          <p class="auth-switch">
+            New here?
+            <button class="link-button" type="button" data-auth-view="signup">
+              Create an account
+            </button>
+          </p>
+        </section>
+
+        <section
+          class="agreement-section"
+          id="signup-view"
+          aria-labelledby="signup-heading"
+          hidden
+        >
+          <h2 id="signup-heading">Create an account</h2>
+          <p>
+            Sign up to log your pieces for bisque firing.
+          </p>
+          <form class="member-form" id="signup-form">
+            <label class="field">
+              <span>Name</span>
+              <input
+                type="text"
+                name="name"
+                autocomplete="name"
+                maxlength="100"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label class="field">
+              <span>Password (at least 8 characters)</span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              />
+            </label>
+            <fieldset class="choice-group">
+              <legend>Membership tier</legend>
+              <label class="choice">
+                <input type="radio" name="tier" value="tier_1" required />
+                <span>
+                  <strong>Tier 1 · $300/month</strong>
+                  Membership benefits
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="tier" value="tier_2" />
+                <span>
+                  <strong>Tier 2 · $325/month</strong>
+                  Membership benefits + 50 lb of white stoneware clay
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="tier" value="tier_3" />
+                <span>
+                  <strong>Tier 3 · $350/month</strong>
+                  Membership benefits + 50 lb of special clay
+                </span>
+              </label>
+            </fieldset>
+            <fieldset class="choice-group">
+              <legend>How you'll pay</legend>
+              <div class="choice-row">
+                <label class="choice">
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value="venmo"
+                    required
+                  />
+                  <span><strong>Venmo</strong></span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="payment_method" value="zelle" />
+                  <span><strong>Zelle</strong></span>
+                </label>
+              </div>
+              <label class="field">
+                <span id="payment-handle-label">Venmo username or Zelle email/phone</span>
+                <input
+                  type="text"
+                  name="payment_handle"
+                  maxlength="100"
+                  autocomplete="off"
+                  required
+                />
+              </label>
+              <p class="field-note">
+                So we can match your membership payments. We never charge your
+                account.
+              </p>
+            </fieldset>
+            <button class="button" type="submit">Create account</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+          <p class="auth-switch">
+            Already have an account?
+            <button class="link-button" type="button" data-auth-view="login">
+              Log in
+            </button>
+          </p>
+        </section>
+
+        <div id="app-view" hidden>
+          <section class="agreement-section member-bar">
+            <p>Signed in as <strong id="member-name"></strong></p>
+            <div class="member-actions">
+              <button
+                class="button button-quiet"
+                type="button"
+                id="show-password-form"
+              >
+                Set password
+              </button>
+              <button class="button button-quiet" type="button" id="sign-out">
+                Sign out
+              </button>
+            </div>
+          </section>
+
+          <section
+            class="agreement-section"
+            id="password-view"
+            aria-labelledby="password-heading"
+            hidden
+          >
+            <h2 id="password-heading">Set a new password</h2>
+            <form class="member-form" id="password-form">
+              <label class="field">
+                <span>New password (at least 8 characters)</span>
+                <input
+                  type="password"
+                  name="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <label class="field">
+                <span>Confirm new password</span>
+                <input
+                  type="password"
+                  name="confirm"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                />
+              </label>
+              <div class="member-actions">
+                <button class="button" type="submit">Save password</button>
+                <button
+                  class="button button-quiet"
+                  type="button"
+                  id="cancel-password"
+                >
+                  Cancel
+                </button>
+              </div>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="submit-heading">
+            <h2 id="submit-heading">Submit a piece for bisque</h2>
+            <form class="member-form" id="piece-form">
+              <label class="field">
+                <span>Title</span>
+                <input type="text" name="title" maxlength="120" required />
+              </label>
+              <label class="field">
+                <span>Description</span>
+                <textarea
+                  name="description"
+                  rows="3"
+                  maxlength="2000"
+                ></textarea>
+              </label>
+              <fieldset class="dimensions">
+                <legend>Size (inches)</legend>
+                <label class="field">
+                  <span>Length</span>
+                  <input
+                    type="number"
+                    name="length"
+                    min="0.25"
+                    max="999"
+                    step="0.25"
+                    inputmode="decimal"
+                    required
+                  />
+                </label>
+                <label class="field">
+                  <span>Width</span>
+                  <input
+                    type="number"
+                    name="width"
+                    min="0.25"
+                    max="999"
+                    step="0.25"
+                    inputmode="decimal"
+                    required
+                  />
+                </label>
+                <label class="field">
+                  <span>Height</span>
+                  <input
+                    type="number"
+                    name="height"
+                    min="0.25"
+                    max="999"
+                    step="0.25"
+                    inputmode="decimal"
+                    required
+                  />
+                </label>
+              </fieldset>
+              <p class="field-note" id="volume-estimate"></p>
+              <button class="button" type="submit">Submit piece</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="pieces-heading">
+            <h2 id="pieces-heading">Your pieces</h2>
+            <p class="field-note" id="pieces-empty" hidden>
+              You haven't logged any pieces yet.
+            </p>
+            <ul class="piece-list" id="piece-list"></ul>
+          </section>
+        </div>
+      </article>
+    </main>
+    <script src="/script.js?v=2" defer></script>
+    <script type="module" src="/members/members.js?v=1"></script>
+  </body>
+</html>

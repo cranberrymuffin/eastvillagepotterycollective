@@ -409,6 +409,348 @@ h1 {
   background: var(--paper);
 }
 
+/* Members area */
+
+.member-form {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 36rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field span,
+.dimensions legend {
+  color: var(--clay-dark);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fffaf2;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.field input[type="file"] {
+  padding: 0.6rem;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--peach);
+  outline-offset: 1px;
+}
+
+.dimensions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dimensions legend {
+  margin-bottom: 0.6rem;
+  padding: 0;
+}
+
+.dimensions .field span {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.field-note,
+.form-status {
+  margin: 0 !important;
+  color: var(--muted) !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem !important;
+}
+
+.form-status:empty {
+  display: none;
+}
+
+.form-status.is-error {
+  color: var(--awning-red) !important;
+}
+
+.button {
+  justify-self: start;
+  padding: 0.8rem 1.4rem;
+  border: 0;
+  background: var(--green);
+  color: var(--white);
+  cursor: pointer;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.button:hover,
+.button:focus-visible {
+  background: var(--clay-dark);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.auth-switch {
+  margin: 1.75rem 0 0 !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.9rem !important;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--peach);
+  text-underline-offset: 0.25rem;
+}
+
+.link-button:hover,
+.link-button:focus-visible {
+  color: var(--clay-dark);
+}
+
+.auth-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0 !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem !important;
+}
+
+#resend-confirmation {
+  justify-self: start;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.85rem;
+}
+
+.member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.choice-group {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice-group legend {
+  margin-bottom: 0.6rem;
+  padding: 0;
+  color: var(--clay-dark);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.choice {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  background: #fffaf2;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.choice input {
+  margin: 0.2rem 0 0;
+  accent-color: var(--green);
+}
+
+.choice strong {
+  display: block;
+  color: var(--clay-dark);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.choice:has(input:focus-visible) {
+  outline: 2px solid var(--peach);
+  outline-offset: 1px;
+}
+
+.button-quiet {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-quiet:hover,
+.button-quiet:focus-visible {
+  background: var(--paper);
+}
+
+.member-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
+  background: var(--paper);
+}
+
+.member-bar p {
+  margin: 0 !important;
+  overflow-wrap: anywhere;
+}
+
+.piece-list {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.piece {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border-left: 3px solid var(--peach);
+  background: rgba(228, 212, 187, 0.45);
+}
+
+.piece:not(:has(.piece-photos)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.piece-photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  align-content: start;
+}
+
+.piece-photos img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.piece-photos img:only-child {
+  grid-column: span 2;
+}
+
+.piece-body {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.piece-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.piece-heading h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.piece-status {
+  padding: 0.2rem 0.5rem;
+  background: var(--peach);
+  color: var(--ink);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.piece-status.status-bisque_fired {
+  background: var(--green);
+  color: var(--white);
+}
+
+.piece-date {
+  margin: 0 !important;
+  color: var(--ink) !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.8rem !important;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.piece-meta {
+  margin: 0 !important;
+  color: var(--clay-dark) !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.8rem !important;
+}
+
+.piece-description {
+  margin: 0 !important;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.piece .button-quiet {
+  justify-self: start;
+  margin-top: 0.25rem;
+}
+
 @media (max-width: 680px) {
   .page {
     padding: 0 1rem 1rem;
@@ -456,5 +798,11 @@ h1 {
   }
   .about-section h1 {
     white-space: normal;
+  }
+  .dimensions {
+    gap: 0.5rem;
+  }
+  .piece {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
