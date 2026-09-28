@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Members | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=12" />
+    <link rel="stylesheet" href="/style.css?v=13" />
   </head>
   <body>
     <main class="page membership-page">
@@ -33,8 +33,9 @@
                 <input type="text" name="full_name" autocomplete="off" maxlength="100" />
               </label>
               <p class="field-note">
-                They'll get an email invite to set a password. Their tier history
-                starts today; change the start date below if they joined earlier.
+                They'll get an email invite to set a password. Their membership
+                starts today; if they joined earlier, edit it in their history
+                below.
               </p>
               <button class="button" type="submit">Add member</button>
               <p class="form-status" role="status" aria-live="polite"></p>
@@ -44,9 +45,9 @@
           <section class="agreement-section" aria-labelledby="members-heading">
             <h2 id="members-heading">Membership history</h2>
             <p>
-              Each period is a tier from its start date to its end date. The
-              period with no end date is the member's current tier; to end a
-              membership, give it an end date.
+              Open a member to change their tier, end their membership, or
+              activate a new one. Their history lists every tier they've had;
+              use Edit to correct a date.
             </p>
             <p class="field-note" id="members-empty" hidden>No members yet.</p>
             <ul class="admin-member-list" id="member-list"></ul>
@@ -55,6 +56,6 @@
       </article>
     </main>
     <script type="module" src="/components/site-nav.js?v=4"></script>
-    <script type="module" src="/members/admin/admin.js?v=1"></script>
+    <script type="module" src="/members/admin/admin.js?v=2"></script>
   </body>
 </html>
