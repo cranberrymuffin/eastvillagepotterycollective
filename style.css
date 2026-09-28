@@ -1030,12 +1030,12 @@ piece-fields {
 }
 
 .calendar-add {
-  margin-left: auto;
+  justify-self: start;
 }
 
 .event-form {
   max-width: none;
-  margin-bottom: 1.5rem;
+  margin-top: 1rem;
   padding: 1.25rem;
   border-left: 3px solid var(--green);
   background: rgba(228, 212, 187, 0.45);
@@ -1262,9 +1262,6 @@ piece-fields {
   }
   .piece {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .calendar-add {
-    margin-left: 0;
   }
   .calendar-month {
     min-width: 0;

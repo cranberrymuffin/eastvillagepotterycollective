@@ -47,8 +47,14 @@ class EventCalendar extends HTMLElement {
         <h3 class="calendar-month"></h3>
         <button class="button button-quiet" type="button" data-step="1" aria-label="Next month">›</button>
         <button class="button button-quiet" type="button" data-today>Today</button>
-        <button class="button calendar-add" type="button">Add event</button>
       </div>
+
+      <div class="calendar-grid" role="grid"></div>
+      <div class="calendar-legend">
+        <span class="event-chip is-studio">Studio event</span>
+        <span class="event-chip">Member event</span>
+      </div>
+      <div class="day-events"></div>
 
       <form class="member-form event-form" hidden>
         <h3 class="event-form-heading">Add an event</h3>
@@ -83,14 +89,7 @@ class EventCalendar extends HTMLElement {
           <button class="button button-quiet" type="button" data-cancel>Cancel</button>
         </div>
         <p class="form-status" role="status" aria-live="polite"></p>
-      </form>
-
-      <div class="calendar-grid" role="grid"></div>
-      <div class="calendar-legend">
-        <span class="event-chip is-studio">Studio event</span>
-        <span class="event-chip">Member event</span>
-      </div>
-      <div class="day-events"></div>`;
+      </form>`;
 
     this.querySelectorAll("[data-step]").forEach((button) =>
       button.addEventListener("click", () => {
@@ -108,9 +107,22 @@ class EventCalendar extends HTMLElement {
       this.#selected = dayKey(today);
       this.load();
     });
-    this.querySelector(".calendar-add").addEventListener("click", () => this.#openForm());
     this.querySelector("[data-cancel]").addEventListener("click", () => this.#closeForm());
-    this.querySelector(".event-form").addEventListener("submit", this.#save);
+    const form = this.querySelector(".event-form");
+    form.addEventListener("submit", this.#save);
+    // Changing the form's date selects that day on the calendar.
+    form.date.addEventListener("change", () => {
+      if (!form.date.value || form.date.value === this.#selected) return;
+      this.#selected = form.date.value;
+      const [year, month] = form.date.value.split("-").map(Number);
+      const shown = this.#month;
+      if (year !== shown.getFullYear() || month - 1 !== shown.getMonth()) {
+        this.#month = new Date(year, month - 1, 1);
+        this.load();
+      } else {
+        this.#render();
+      }
+    });
   }
 
   start(member) {
@@ -227,15 +239,29 @@ class EventCalendar extends HTMLElement {
       }),
     );
 
+    // Adding an event goes under the chosen day, for that day.
+    const add = el("button", "button calendar-add", `Add event on ${new Date(
+      year,
+      month - 1,
+      date,
+    ).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`);
+    add.type = "button";
+    add.addEventListener("click", () => this.#openForm());
+
+    // A new event that's being filled in follows the day picked.
+    const form = this.querySelector(".event-form");
+    add.hidden = !form.hidden;
+    if (!form.hidden && !this.#editing) form.date.value = this.#selected;
+
     const events = this.#eventsOn(this.#selected);
     if (!events.length) {
-      panel.replaceChildren(heading, el("p", "field-note", "Nothing scheduled."));
+      panel.replaceChildren(heading, el("p", "field-note", "Nothing scheduled."), add);
       return;
     }
 
     const list = el("ul", "event-list");
     events.forEach((event) => list.append(this.#renderEvent(event)));
-    panel.replaceChildren(heading, list);
+    panel.replaceChildren(heading, list, add);
   }
 
   #renderEvent(event) {
@@ -310,12 +336,15 @@ class EventCalendar extends HTMLElement {
     }
 
     form.hidden = false;
-    form.elements.title.focus();
+    this.querySelector(".calendar-add").hidden = true;
+    form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    form.elements.title.focus({ preventScroll: true });
   }
 
   #closeForm() {
     this.#editing = null;
     this.querySelector(".event-form").hidden = true;
+    this.querySelector(".calendar-add").hidden = false;
   }
 
   #save = (submitEvent) => {
