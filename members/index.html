@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Members | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=8" />
+    <link rel="stylesheet" href="/style.css?v=9" />
   </head>
   <body>
     <main class="page membership-page">
@@ -116,26 +116,19 @@
         </section>
 
         <div id="app-view" hidden>
-          <section class="agreement-section" aria-labelledby="submit-heading">
-            <h2 id="submit-heading">Submit a piece for bisque</h2>
-            <form class="member-form" id="piece-form">
-              <piece-fields></piece-fields>
-              <button class="button" type="submit">Submit piece</button>
-              <p class="form-status" role="status" aria-live="polite"></p>
-            </form>
+          <section class="agreement-section" aria-labelledby="calendar-heading">
+            <h2 id="calendar-heading">Studio calendar</h2>
+            <event-calendar></event-calendar>
           </section>
 
-          <section class="agreement-section" aria-labelledby="pieces-heading">
-            <h2 id="pieces-heading">Your pieces</h2>
-            <p class="field-note" id="pieces-empty" hidden>
-              You haven't logged any pieces yet.
-            </p>
-            <ul class="piece-list" id="piece-list"></ul>
+          <section class="agreement-section" aria-labelledby="feed-heading">
+            <h2 id="feed-heading">Posts</h2>
+            <member-feed></member-feed>
           </section>
         </div>
       </article>
     </main>
-    <script type="module" src="/components/site-nav.js?v=1"></script>
-    <script type="module" src="/members/members.js?v=3"></script>
+    <script type="module" src="/components/site-nav.js?v=2"></script>
+    <script type="module" src="/members/members.js?v=4"></script>
   </body>
 </html>

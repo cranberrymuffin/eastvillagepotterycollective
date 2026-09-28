@@ -103,7 +103,9 @@ class SiteNav extends HTMLElement {
       window.location.assign("/members/");
     });
     submenu.append(
-      makeLink(["/members/", "Bisque log"]),
+      makeLink(["/members/", "Home"]),
+      makeLink(["/members/bisque/", "Bisque log"]),
+      makeLink(["/members/invoices/", "Invoices"]),
       makeLink(["/members/account/", "Account settings"]),
       signOut,
     );

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Bisque log | East Village Pottery Collective</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css?v=9" />
+  </head>
+  <body>
+    <main class="page membership-page">
+      <site-nav></site-nav>
+      <article class="membership-card">
+        <header class="membership-header">
+          <p class="contact-label">East Village Pottery Collective</p>
+          <h1>Bisque log</h1>
+          <p class="membership-lede">
+            Log the pieces you've put on the bisque shelf.
+          </p>
+        </header>
+
+        <p class="agreement-section form-status" id="page-status" hidden></p>
+
+        <div id="bisque-view" hidden>
+          <section class="agreement-section" aria-labelledby="submit-heading">
+            <h2 id="submit-heading">Submit a piece for bisque</h2>
+            <form class="member-form" id="piece-form">
+              <piece-fields></piece-fields>
+              <button class="button" type="submit">Submit piece</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="pieces-heading">
+            <h2 id="pieces-heading">Your pieces</h2>
+            <p class="field-note" id="pieces-empty" hidden>
+              You haven't logged any pieces yet.
+            </p>
+            <ul class="piece-list" id="piece-list"></ul>
+          </section>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="/components/site-nav.js?v=2"></script>
+    <script type="module" src="/members/bisque/bisque.js?v=1"></script>
+  </body>
+</html>
