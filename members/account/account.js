@@ -7,6 +7,9 @@ import {
   setStatus,
   withForm,
   authErrorMessage,
+  isSessionGone,
+  endStaleSession,
+  verifySession,
 } from "../shared.js";
 import "../components/tier-picker.js";
 import "../components/payment-fields.js";
@@ -49,6 +52,7 @@ const showPaymentStatus = () => {
 };
 
 const start = async (sessionUser) => {
+  if (!(await verifySession())) return;
   user = sessionUser;
   emailForm.email.value = user.email;
   profile = (await loadProfile(user.id)) ?? { id: user.id };
@@ -147,7 +151,9 @@ emailForm.addEventListener("submit", (event) => {
       { email },
       { emailRedirectTo },
     );
-    if (error) {
+    if (isSessionGone(error)) {
+      await endStaleSession();
+    } else if (error) {
       console.error(error);
       setStatus(
         emailForm,
@@ -181,7 +187,9 @@ passwordForm.addEventListener("submit", (event) => {
     const { error } = await supabase.auth.updateUser({
       password: data.get("password"),
     });
-    if (error) {
+    if (isSessionGone(error)) {
+      await endStaleSession();
+    } else if (error) {
       console.error(error);
       setStatus(
         passwordForm,

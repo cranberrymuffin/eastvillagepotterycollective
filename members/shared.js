@@ -31,6 +31,34 @@ export const loadProfile = async (userId) => {
   return data;
 };
 
+// The auth server no longer recognises this browser's login (e.g. it was
+// signed out elsewhere or the account was changed in the dashboard). The
+// stored token still looks valid locally, so detect it from the error.
+const DEAD_SESSION_CODES = [
+  "session_not_found",
+  "refresh_token_not_found",
+  "user_not_found",
+  "bad_jwt",
+];
+
+export const isSessionGone = (error) => DEAD_SESSION_CODES.includes(error?.code);
+
+// Clears the dead login from this browser and returns to the login form.
+export const endStaleSession = async () => {
+  await supabase.auth.signOut({ scope: "local" });
+  window.location.assign("/members/?expired");
+};
+
+// Checks the stored login with the auth server; ends it if it's gone.
+export const verifySession = async () => {
+  const { error } = await supabase.auth.getUser();
+  if (isSessionGone(error)) {
+    await endStaleSession();
+    return false;
+  }
+  return true;
+};
+
 export const setStatus = (form, message, isError = false) => {
   const status = form.querySelector(".form-status");
   status.textContent = message;

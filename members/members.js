@@ -6,6 +6,7 @@ import {
   setStatus,
   withForm,
   authErrorMessage,
+  verifySession,
 } from "./shared.js";
 import { formatVolume, formatPieceNumber } from "./studio.js";
 import "./components/tier-picker.js";
@@ -39,6 +40,12 @@ let currentUser = null;
 
 let authView = "login";
 
+// Sent back here after a login that had ended elsewhere.
+if (new URLSearchParams(window.location.search).has("expired")) {
+  setStatus(loginForm, "Your session expired. Please log in again.");
+  history.replaceState(null, "", window.location.pathname);
+}
+
 const showAuthView = (view) => {
   authView = view;
   loginView.hidden = view !== "login";
@@ -59,9 +66,10 @@ const showSignedOut = () => {
   pieceList.replaceChildren();
 };
 
-const showSignedIn = (user) => {
+const showSignedIn = async (user) => {
   if (currentUser?.id === user.id) return;
   currentUser = user;
+  if (!(await verifySession())) return;
   loginView.hidden = true;
   signupView.hidden = true;
   appView.hidden = false;
