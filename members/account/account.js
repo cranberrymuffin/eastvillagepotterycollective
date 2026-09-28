@@ -11,11 +11,13 @@ import {
   endStaleSession,
   verifySession,
 } from "../shared.js";
+import { TIERS, formatPlainDate, todayInStudio } from "../studio.js";
 import "../components/tier-picker.js";
 import "../components/payment-fields.js";
 
 const accountView = document.querySelector("#account-view");
 const profileForm = document.querySelector("#profile-form");
+const memberSinceForm = document.querySelector("#member-since-form");
 const tierForm = document.querySelector("#tier-form");
 const tierPicker = tierForm.querySelector("tier-picker");
 const paymentForm = document.querySelector("#payment-form");
@@ -37,9 +39,49 @@ const showProfile = () => {
   profileForm.full_name.value = profile.full_name ?? "";
   profileForm.pronouns.value = profile.pronouns ?? "";
   profileForm.bio.value = profile.bio ?? "";
+  showMemberSince();
   tierPicker.value = profile.tier;
   paymentFields.setSaved(profile.payment_method, profile.payment_handle);
   showPaymentStatus();
+};
+
+// Members set their start date once; after that it's shown, not editable.
+const showMemberSince = () => {
+  const memberSince = document.querySelector("#member-since");
+  memberSince.hidden = !profile.member_since;
+  memberSinceForm.hidden = Boolean(profile.member_since);
+  if (profile.member_since) {
+    memberSince.textContent = `Member since ${formatPlainDate(profile.member_since)}`;
+  } else {
+    memberSinceForm.member_since.max = todayInStudio();
+  }
+};
+
+// Which tier the member had when, newest first (from membership_periods).
+const loadTierHistory = async () => {
+  const { data: periods, error } = await supabase
+    .from("membership_periods")
+    .select("tier, starts_on, ends_on")
+    .order("starts_on", { ascending: false });
+  if (error) console.error(error);
+
+  const history = document.querySelector("#tier-history");
+  history.hidden = !periods?.length;
+  document.querySelector("#tier-history-list").replaceChildren(
+    ...(periods ?? []).map((period) => {
+      const item = document.createElement("li");
+      const name = document.createElement("strong");
+      name.textContent = TIERS[period.tier]?.name ?? period.tier;
+      const from = formatPlainDate(period.starts_on, "short");
+      item.append(
+        name,
+        period.ends_on
+          ? ` · ${from} – ${formatPlainDate(period.ends_on, "short")}`
+          : ` · since ${from}`,
+      );
+      return item;
+    }),
+  );
 };
 
 const showPaymentStatus = () => {
@@ -58,6 +100,7 @@ const start = async (sessionUser) => {
   profile = (await loadProfile(user.id)) ?? { id: user.id };
   accountView.hidden = false;
   showProfile();
+  loadTierHistory();
 
   // Arrived from a "reset your password" email.
   if (window.location.hash === "#password") {
@@ -99,6 +142,8 @@ const saveProfile = async (form, changes, successMessage) => {
   profile = data;
   showProfile();
   setStatus(form, successMessage);
+  // Tier and start-date changes are recorded in the tier history.
+  if ("tier" in changes || "member_since" in changes) loadTierHistory();
 };
 
 profileForm.addEventListener("submit", (event) => {
@@ -113,6 +158,17 @@ profileForm.addEventListener("submit", (event) => {
         bio: data.get("bio").trim() || null,
       },
       "Profile saved.",
+    ),
+  );
+});
+
+memberSinceForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  withForm(memberSinceForm, "Saving…", () =>
+    saveProfile(
+      memberSinceForm,
+      { member_since: memberSinceForm.member_since.value },
+      "Member since date saved.",
     ),
   );
 });

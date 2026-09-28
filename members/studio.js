@@ -21,11 +21,34 @@ export const tierLabel = (tier) =>
 // Bisque + glaze firing, per the fees on /membership/.
 export const FIRING_RATE_PER_CUBIC_INCH = 0.06;
 
-export const formatVolume = (length, width, height) => {
-  const volume = length * width * height;
-  return `${volume.toLocaleString(undefined, { maximumFractionDigits: 1 })} in³ · est. $${(
-    volume * FIRING_RATE_PER_CUBIC_INCH
-  ).toFixed(2)} to fire`;
+// Firing fee in dollars, rounded to the cent.
+export const firingCost = (length, width, height) =>
+  Math.round(length * width * height * FIRING_RATE_PER_CUBIC_INCH * 100) / 100;
+
+export const formatMoney = (dollars) =>
+  dollars.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+export const formatCubicInches = (length, width, height) =>
+  `${(length * width * height).toLocaleString(undefined, { maximumFractionDigits: 1 })} in³`;
+
+export const formatVolume = (length, width, height) =>
+  `${formatCubicInches(length, width, height)} · est. $${firingCost(length, width, height).toFixed(2)} to fire`;
+
+// The studio's time zone: invoices and "member since" follow New York dates.
+export const STUDIO_TIME_ZONE = "America/New_York";
+
+// Today's date in the studio's time zone, as "2026-09-27".
+export const todayInStudio = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: STUDIO_TIME_ZONE }).format(new Date());
+
+// Plain dates ("2026-03-14", like profiles.member_since), shown as written.
+export const formatPlainDate = (date, month = "long") => {
+  const [year, monthNumber, day] = date.split("-").map(Number);
+  return new Date(year, monthNumber - 1, day).toLocaleDateString(undefined, {
+    month,
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
 export const formatPieceNumber = (number) => `#${String(number).padStart(4, "0")}`;

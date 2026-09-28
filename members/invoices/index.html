@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Invoices | East Village Pottery Collective</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css?v=10" />
+  </head>
+  <body>
+    <main class="page membership-page">
+      <site-nav></site-nav>
+      <article class="membership-card">
+        <header class="membership-header">
+          <p class="contact-label">East Village Pottery Collective</p>
+          <h1>Invoices</h1>
+        </header>
+
+        <p class="agreement-section form-status" id="page-status" hidden></p>
+
+        <div id="invoices-view" hidden>
+          <section class="agreement-section" aria-labelledby="current-heading">
+            <h2 id="current-heading">This month</h2>
+            <p class="member-since" id="member-since"></p>
+            <p>
+              Each statement is your membership fee plus firing fees ($0.06 per
+              cubic inch) for the pieces bisque fired that month.
+            </p>
+            <p class="field-note" id="current-empty" hidden></p>
+            <div id="current-statement"></div>
+          </section>
+
+          <section class="agreement-section" aria-labelledby="past-heading">
+            <h2 id="past-heading">Past statements</h2>
+            <p class="field-note" id="past-empty" hidden>
+              No past statements yet.
+            </p>
+            <ul class="invoice-list" id="past-statements"></ul>
+          </section>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="/components/site-nav.js?v=2"></script>
+    <script type="module" src="/members/invoices/invoices.js?v=1"></script>
+  </body>
+</html>
