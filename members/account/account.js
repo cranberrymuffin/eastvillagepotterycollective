@@ -43,12 +43,14 @@ const showProfile = () => {
   showPaymentStatus();
 };
 
-// Which tier the member had when, newest first (from membership_periods).
+// Tiers the member had before, newest first (ended membership_periods).
+// The current tier is shown in the tier picker above.
 const loadTierHistory = async () => {
   const { data: periods, error } = await supabase
     .from("membership_periods")
     .select("tier, starts_on, ends_on")
     .eq("user_id", user.id)
+    .not("ends_on", "is", null)
     .order("starts_on", { ascending: false });
   if (error) console.error(error);
 
@@ -60,12 +62,7 @@ const loadTierHistory = async () => {
       const name = document.createElement("strong");
       name.textContent = TIERS[period.tier]?.name ?? period.tier;
       const from = formatPlainDate(period.starts_on, "short");
-      item.append(
-        name,
-        period.ends_on
-          ? ` · ${from} – ${formatPlainDate(period.ends_on, "short")}`
-          : ` · since ${from}`,
-      );
+      item.append(name, ` · ${from} – ${formatPlainDate(period.ends_on, "short")}`);
       return item;
     }),
   );
