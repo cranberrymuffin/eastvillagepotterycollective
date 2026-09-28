@@ -34,14 +34,10 @@ export const formatCubicInches = (length, width, height) =>
 export const formatVolume = (length, width, height) =>
   `${formatCubicInches(length, width, height)} · est. $${firingCost(length, width, height).toFixed(2)} to fire`;
 
-// The studio's time zone: invoices and "member since" follow New York dates.
+// The studio's time zone: statements follow New York dates.
 export const STUDIO_TIME_ZONE = "America/New_York";
 
-// Today's date in the studio's time zone, as "2026-09-27".
-export const todayInStudio = () =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: STUDIO_TIME_ZONE }).format(new Date());
-
-// Plain dates ("2026-03-14", like profiles.member_since), shown as written.
+// Plain dates ("2026-03-14", like membership_periods.starts_on), shown as written.
 export const formatPlainDate = (date, month = "long") => {
   const [year, monthNumber, day] = date.split("-").map(Number);
   return new Date(year, monthNumber - 1, day).toLocaleDateString(undefined, {

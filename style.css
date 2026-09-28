@@ -881,14 +881,6 @@ piece-fields {
   white-space: nowrap;
 }
 
-.member-since {
-  color: var(--clay-dark) !important;
-  font-family: "Trebuchet MS", sans-serif;
-  font-size: 0.85rem !important;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
 .tier-history {
   margin-top: 2rem;
 }

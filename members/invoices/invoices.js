@@ -1,7 +1,6 @@
 import {
   supabase,
   showNotConfigured,
-  loadProfile,
   requireMember,
   el,
 } from "../shared.js?v=2";
@@ -11,12 +10,10 @@ import {
   firingCost,
   formatMoney,
   formatCubicInches,
-  formatPlainDate,
   formatPieceNumber,
-} from "../studio.js?v=2";
+} from "../studio.js?v=3";
 
 const invoicesView = document.querySelector("#invoices-view");
-const memberSince = document.querySelector("#member-since");
 const currentStatement = document.querySelector("#current-statement");
 const currentEmpty = document.querySelector("#current-empty");
 const pastStatements = document.querySelector("#past-statements");
@@ -63,35 +60,33 @@ const monthsBetween = (first, last) => {
 
 // Invoices -----------------------------------------------------------------
 
-// Fees are due on the 1st, so a month is billed at the tier in effect then
-// (or on the day they joined, in their first month). Periods come from
-// membership_periods, oldest first; none in effect means no membership fee.
-const tierForMonth = (periods, month, memberSince) => {
+// Fees are due on the 1st, so a month is billed at the tier in effect then,
+// or, in a month the membership starts, the tier it starts on. Periods come
+// from membership_periods, oldest first; none means no membership fee.
+const tierForMonth = (periods, month) => {
   const firstDay = `${month}-01`;
-  const day = memberSince > firstDay ? memberSince : firstDay;
-  const period = periods.find(
-    (period) => period.starts_on <= day && (!period.ends_on || period.ends_on >= day),
-  );
+  const period =
+    periods.find(
+      (period) =>
+        period.starts_on <= firstDay && (!period.ends_on || period.ends_on >= firstDay),
+    ) ?? periods.find((period) => period.starts_on.startsWith(month));
   return period && TIERS[period.tier];
 };
 
-const buildInvoices = (profile, pieces, periods) => {
+const buildInvoices = (pieces, periods) => {
   const piecesByMonth = new Map();
   pieces.forEach((piece) => {
     const month = monthKey(new Date(piece.bisque_fired_at));
     piecesByMonth.set(month, [...(piecesByMonth.get(month) ?? []), piece]);
   });
-  const joined = profile.member_since.slice(0, 7);
-  // Every month since joining, plus any earlier month with a firing (if the
-  // studio back-dates either), so no firing is left off.
-  const earlierFirings = [...piecesByMonth.keys()].filter((month) => month < joined);
-  const months = [
-    ...monthsBetween(joined, monthKey(new Date())),
-    ...earlierFirings.sort().reverse(),
-  ];
+  // From the first tier period or firing, whichever came first.
+  const first = [periods[0]?.starts_on.slice(0, 7), ...piecesByMonth.keys()]
+    .filter(Boolean)
+    .sort()[0];
+  if (!first) return [];
 
-  return months.map((month) => {
-    const tier = month >= joined && tierForMonth(periods, month, profile.member_since);
+  return monthsBetween(first, monthKey(new Date())).map((month) => {
+    const tier = tierForMonth(periods, month);
     const lines = [
       ...(tier ? [{ label: `Membership · ${tier.name}`, amount: tier.price }] : []),
       ...(piecesByMonth.get(month) ?? []).map((piece) => {
@@ -152,10 +147,9 @@ const renderInvoice = ({ month, lines, total }, isCurrent) => {
   return item;
 };
 
-const loadInvoices = async (userId) => {
-  const [profile, { data: pieces, error }, { data: periods, error: periodsError }] =
+const loadInvoices = async () => {
+  const [{ data: pieces, error }, { data: periods, error: periodsError }] =
     await Promise.all([
-      loadProfile(userId),
       supabase
         .from("pieces")
         .select("piece_number, title, length_in, width_in, height_in, bisque_fired_at")
@@ -168,34 +162,15 @@ const loadInvoices = async (userId) => {
     ]);
 
   invoicesView.hidden = false;
-  if (error || periodsError || !profile) {
-    if (error || periodsError) console.error(error ?? periodsError);
-    memberSince.hidden = true;
+  if (error || periodsError) {
+    console.error(error ?? periodsError);
     currentEmpty.textContent = "Couldn't load your statements. Please refresh.";
     currentEmpty.hidden = false;
     return;
   }
 
-  // Statements start from the member's start date, which they set once.
-  if (!profile.member_since) {
-    memberSince.hidden = true;
-    const link = el("a", null, "Add it on My account");
-    link.href = "/members/account/";
-    currentEmpty.replaceChildren(
-      "Your statements start from the day your membership began. ",
-      link,
-      ".",
-    );
-    currentEmpty.hidden = false;
-    pastEmpty.hidden = false;
-    return;
-  }
-
-  memberSince.hidden = false;
-  memberSince.textContent = `Member since ${formatPlainDate(profile.member_since)}`;
-
   const thisMonth = monthKey(new Date());
-  const invoices = buildInvoices(profile, pieces, periods);
+  const invoices = buildInvoices(pieces, periods);
   const current = invoices.find((invoice) => invoice.month === thisMonth);
   const past = invoices.filter((invoice) => invoice.month < thisMonth);
 
@@ -208,4 +183,5 @@ const loadInvoices = async (userId) => {
   pastStatements.replaceChildren(...past.map((invoice) => renderInvoice(invoice, false)));
 };
 
-requireMember((user) => loadInvoices(user.id));
+// Row-level security limits both queries to the member's own rows.
+requireMember(() => loadInvoices());

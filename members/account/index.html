@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>My account | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=10" />
+    <link rel="stylesheet" href="/style.css?v=11" />
   </head>
   <body>
     <main class="page membership-page">
@@ -56,19 +56,6 @@
             aria-labelledby="membership-heading"
           >
             <h2 id="membership-heading">Membership</h2>
-            <p class="member-since" id="member-since" hidden></p>
-            <form class="member-form" id="member-since-form" hidden>
-              <label class="field">
-                <span>Member since</span>
-                <input type="date" name="member_since" required />
-              </label>
-              <p class="field-note">
-                The day your studio membership started. You can set this once;
-                after that, ask the studio to change it.
-              </p>
-              <button class="button" type="submit">Save date</button>
-              <p class="form-status" role="status" aria-live="polite"></p>
-            </form>
             <form class="member-form" id="tier-form">
               <tier-picker name="tier" required></tier-picker>
               <p class="field-note">
@@ -146,6 +133,6 @@
       </article>
     </main>
     <script type="module" src="/components/site-nav.js?v=3"></script>
-    <script type="module" src="/members/account/account.js?v=5"></script>
+    <script type="module" src="/members/account/account.js?v=6"></script>
   </body>
 </html>

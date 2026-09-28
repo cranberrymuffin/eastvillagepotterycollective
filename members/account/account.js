@@ -11,13 +11,12 @@ import {
   endStaleSession,
   verifySession,
 } from "../shared.js?v=2";
-import { TIERS, formatPlainDate, todayInStudio } from "../studio.js?v=2";
+import { TIERS, formatPlainDate } from "../studio.js?v=3";
 import "../components/tier-picker.js";
 import "../components/payment-fields.js";
 
 const accountView = document.querySelector("#account-view");
 const profileForm = document.querySelector("#profile-form");
-const memberSinceForm = document.querySelector("#member-since-form");
 const tierForm = document.querySelector("#tier-form");
 const tierPicker = tierForm.querySelector("tier-picker");
 const paymentForm = document.querySelector("#payment-form");
@@ -39,22 +38,9 @@ const showProfile = () => {
   profileForm.full_name.value = profile.full_name ?? "";
   profileForm.pronouns.value = profile.pronouns ?? "";
   profileForm.bio.value = profile.bio ?? "";
-  showMemberSince();
   tierPicker.value = profile.tier;
   paymentFields.setSaved(profile.payment_method, profile.payment_handle);
   showPaymentStatus();
-};
-
-// Members set their start date once; after that it's shown, not editable.
-const showMemberSince = () => {
-  const memberSince = document.querySelector("#member-since");
-  memberSince.hidden = !profile.member_since;
-  memberSinceForm.hidden = Boolean(profile.member_since);
-  if (profile.member_since) {
-    memberSince.textContent = `Member since ${formatPlainDate(profile.member_since)}`;
-  } else {
-    memberSinceForm.member_since.max = todayInStudio();
-  }
 };
 
 // Which tier the member had when, newest first (from membership_periods).
@@ -142,8 +128,8 @@ const saveProfile = async (form, changes, successMessage) => {
   profile = data;
   showProfile();
   setStatus(form, successMessage);
-  // Tier and start-date changes are recorded in the tier history.
-  if ("tier" in changes || "member_since" in changes) loadTierHistory();
+  // Tier changes are recorded in the tier history.
+  if ("tier" in changes) loadTierHistory();
 };
 
 profileForm.addEventListener("submit", (event) => {
@@ -158,17 +144,6 @@ profileForm.addEventListener("submit", (event) => {
         bio: data.get("bio").trim() || null,
       },
       "Profile saved.",
-    ),
-  );
-});
-
-memberSinceForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  withForm(memberSinceForm, "Saving…", () =>
-    saveProfile(
-      memberSinceForm,
-      { member_since: memberSinceForm.member_since.value },
-      "Member since date saved.",
     ),
   );
 });
