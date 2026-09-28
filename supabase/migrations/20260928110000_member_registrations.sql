@@ -6,13 +6,15 @@ create table if not exists public.member_registrations (
   email text primary key check (email = lower(trim(email)) and email like '%_@_%'),
   full_name text check (char_length(full_name) <= 100),
   tier text not null check (tier in ('tier_1', 'tier_2', 'tier_3')),
+  -- When their membership (first tier period) starts; set by the studio.
+  starts_on date not null default (now() at time zone 'America/New_York')::date,
   registered_at timestamptz not null default now()
 );
 
 alter table public.member_registrations enable row level security;
 
 revoke all on public.member_registrations from anon, authenticated;
-grant select, insert (email, full_name, tier), delete
+grant select, insert (email, full_name, tier, starts_on), delete
   on public.member_registrations to authenticated;
 
 drop policy if exists "Admins read registrations" on public.member_registrations;
@@ -53,7 +55,8 @@ create trigger before_auth_user_created
 
 -- New profiles take their name and tier from the registration (members
 -- can't pick their own tier), then the registration is used up. The tier
--- starts the member's history via on_profile_tier_change.
+-- starts the member's history via on_profile_tier_change, which dates it
+-- today; it's then moved to the start date the studio registered.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -76,6 +79,10 @@ begin
     nullif(new.raw_user_meta_data ->> 'payment_method', ''),
     nullif(trim(new.raw_user_meta_data ->> 'payment_handle'), '')
   );
+
+  update public.membership_periods
+  set starts_on = registration.starts_on
+  where user_id = new.id and ends_on is null and registration.starts_on is not null;
 
   delete from public.member_registrations where email = lower(new.email);
   return new;
