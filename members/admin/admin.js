@@ -266,6 +266,50 @@ const renderMember = (member, periods) => {
       return b;
     };
 
+    // Correct a period's tier or dates, or delete it.
+    const editPeriod = (period, slot) => {
+      const remove = el("button", "button button-quiet", "Delete");
+      remove.type = "button";
+      const form = actionForm({
+        fields: [
+          tierSelect(period.tier),
+          dateField("Starts", "starts_on", period.starts_on),
+          dateField("Ends (blank = current)", "ends_on", period.ends_on, false),
+        ],
+        submitLabel: "Save",
+        extraButtons: [remove],
+        onSubmit: async (form) =>
+          (
+            await supabase
+              .from("membership_periods")
+              .update({
+                tier: form.tier.value,
+                starts_on: form.starts_on.value,
+                ends_on: form.ends_on.value || null,
+              })
+              .eq("id", period.id)
+          ).error,
+        onDone: reload,
+      });
+      remove.addEventListener("click", () => {
+        if (!window.confirm("Delete this period from their history?")) return;
+        withForm(form, "Deleting…", async () => {
+          const { error } = await supabase
+            .from("membership_periods")
+            .delete()
+            .eq("id", period.id);
+          if (error) {
+            console.error(error);
+            setStatus(form, "Couldn't delete. Please try again.", true);
+          } else {
+            closeOpenForm = null;
+            reload();
+          }
+        });
+      });
+      openForm(slot, form);
+    };
+
     if (current) {
       actions.append(
         button("Change tier", false, () =>
@@ -292,6 +336,7 @@ const renderMember = (member, periods) => {
             }),
           ),
         ),
+        button("Edit", true, () => editPeriod(current, actionSlot)),
         button("End membership", true, () =>
           openForm(
             actionSlot,
@@ -340,54 +385,14 @@ const renderMember = (member, periods) => {
     actionSlot.append(actions);
     status.append(heading, actionSlot);
 
-    // History, newest first; any period can be corrected.
+    // Past (ended) periods, newest first; the current one is shown above.
     const history = el("ol", "period-list");
-    [...memberPeriods].reverse().forEach((period) => {
+    const past = memberPeriods.filter((period) => period.ends_on);
+    [...past].reverse().forEach((period) => {
       const row = el("li", "period-row");
       const text = el("span", null);
       text.append(el("strong", null, TIERS[period.tier]?.name ?? period.tier), ` · ${periodDates(period)}`);
-      const edit = button("Edit", true, () => {
-        const remove = el("button", "button button-quiet", "Delete");
-        remove.type = "button";
-        const form = actionForm({
-          fields: [
-            tierSelect(period.tier),
-            dateField("Starts", "starts_on", period.starts_on),
-            dateField("Ends (blank = current)", "ends_on", period.ends_on, false),
-          ],
-          submitLabel: "Save",
-          extraButtons: [remove],
-          onSubmit: async (form) =>
-            (
-              await supabase
-                .from("membership_periods")
-                .update({
-                  tier: form.tier.value,
-                  starts_on: form.starts_on.value,
-                  ends_on: form.ends_on.value || null,
-                })
-                .eq("id", period.id)
-            ).error,
-          onDone: reload,
-        });
-        remove.addEventListener("click", () => {
-          if (!window.confirm("Delete this period from their history?")) return;
-          withForm(form, "Deleting…", async () => {
-            const { error } = await supabase
-              .from("membership_periods")
-              .delete()
-              .eq("id", period.id);
-            if (error) {
-              console.error(error);
-              setStatus(form, "Couldn't delete. Please try again.", true);
-            } else {
-              closeOpenForm = null;
-              reload();
-            }
-          });
-        });
-        openForm(row, form);
-      });
+      const edit = button("Edit", true, () => editPeriod(period, row));
       edit.classList.add("period-edit");
       row.append(text, edit);
       history.append(row);
@@ -396,7 +401,7 @@ const renderMember = (member, periods) => {
     body.replaceChildren(
       status,
       el("h3", null, "History"),
-      memberPeriods.length ? history : el("p", "field-note", "No tier history yet."),
+      past.length ? history : el("p", "field-note", "No past tiers."),
     );
   }
 
