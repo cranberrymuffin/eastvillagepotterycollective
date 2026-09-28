@@ -10,8 +10,8 @@ import {
   isSessionGone,
   endStaleSession,
   verifySession,
-} from "../shared.js";
-import { TIERS, formatPlainDate, todayInStudio } from "../studio.js";
+} from "../shared.js?v=2";
+import { TIERS, formatPlainDate, todayInStudio } from "../studio.js?v=2";
 import "../components/tier-picker.js";
 import "../components/payment-fields.js";
 

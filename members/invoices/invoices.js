@@ -4,7 +4,7 @@ import {
   loadProfile,
   requireMember,
   el,
-} from "../shared.js";
+} from "../shared.js?v=2";
 import {
   TIERS,
   STUDIO_TIME_ZONE,
@@ -13,7 +13,7 @@ import {
   formatCubicInches,
   formatPlainDate,
   formatPieceNumber,
-} from "../studio.js";
+} from "../studio.js?v=2";
 
 const invoicesView = document.querySelector("#invoices-view");
 const memberSince = document.querySelector("#member-since");

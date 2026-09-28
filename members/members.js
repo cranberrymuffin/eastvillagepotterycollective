@@ -8,11 +8,11 @@ import {
   withForm,
   authErrorMessage,
   verifySession,
-} from "./shared.js";
+} from "./shared.js?v=2";
 import "./components/tier-picker.js";
 import "./components/payment-fields.js";
-import "./components/member-feed.js";
-import "./components/event-calendar.js";
+import "./components/member-feed.js?v=2";
+import "./components/event-calendar.js?v=2";
 
 const loginView = document.querySelector("#login-view");
 const signupView = document.querySelector("#signup-view");

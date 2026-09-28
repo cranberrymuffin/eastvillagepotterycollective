@@ -5,8 +5,8 @@ import {
   setStatus,
   withForm,
   el,
-} from "../shared.js";
-import { formatVolume, formatPieceNumber } from "../studio.js";
+} from "../shared.js?v=2";
+import { formatVolume, formatPieceNumber } from "../studio.js?v=2";
 import "../components/piece-fields.js";
 
 const BUCKET = "piece-photos";

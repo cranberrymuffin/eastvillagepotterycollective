@@ -11,7 +11,7 @@ import {
   memberName,
   renderByline,
   el,
-} from "../shared.js";
+} from "../shared.js?v=2";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MAX_CHIPS = 2;

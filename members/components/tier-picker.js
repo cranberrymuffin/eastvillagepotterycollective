@@ -1,7 +1,7 @@
 // <tier-picker name="tier" required>: membership tier radio buttons.
 // Renders into light DOM so the radios submit with the surrounding form and
 // pick up the site styles.
-import { TIERS } from "../studio.js";
+import { TIERS } from "../studio.js?v=2";
 
 class TierPicker extends HTMLElement {
   connectedCallback() {

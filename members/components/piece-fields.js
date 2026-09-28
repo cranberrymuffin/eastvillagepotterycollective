@@ -1,7 +1,7 @@
 // <piece-fields>: title, description, size and a live firing-cost estimate
 // for a piece. Used by the "Submit a piece" form and the edit form on each
 // piece card. Renders into light DOM so the inputs belong to the parent form.
-import { formatVolume } from "../studio.js";
+import { formatVolume } from "../studio.js?v=2";
 
 const DIMENSIONS = [
   ["length_in", "Length"],
