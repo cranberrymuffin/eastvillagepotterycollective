@@ -480,6 +480,11 @@ h1 {
   max-width: 36rem;
 }
 
+piece-fields {
+  display: grid;
+  gap: 1.25rem;
+}
+
 .field {
   display: grid;
   gap: 0.4rem;
