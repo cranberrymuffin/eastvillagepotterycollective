@@ -2,21 +2,25 @@ import {
   supabase,
   showNotConfigured,
   requireMember,
+  loadProfile,
   el,
-} from "../shared.js?v=2";
+} from "../shared.js?v=3";
 import {
-  TIERS,
-  STUDIO_TIME_ZONE,
-  firingCost,
-  formatMoney,
-  formatCubicInches,
-  formatPieceNumber,
-} from "../studio.js?v=3";
+  PIECE_COLUMNS,
+  PERIOD_COLUMNS,
+  buildInvoices,
+  renderInvoice,
+  monthKey,
+  monthLabel,
+  showStatements,
+} from "../statements.js?v=2";
+import { formatMoney } from "../studio.js?v=3";
 
 const invoicesView = document.querySelector("#invoices-view");
-const currentStatement = document.querySelector("#current-statement");
+const intro = document.querySelector("#invoices-intro");
+const current = document.querySelector("#current-statement");
 const currentEmpty = document.querySelector("#current-empty");
-const pastStatements = document.querySelector("#past-statements");
+const past = document.querySelector("#past-statements");
 const pastEmpty = document.querySelector("#past-empty");
 
 if (!supabase) {
@@ -24,164 +28,119 @@ if (!supabase) {
   throw new Error("Supabase is not configured in /members/config.js");
 }
 
-// Months -------------------------------------------------------------------
-
-// Months are keyed "2026-09", in the studio's time zone.
-const monthKeyFormat = new Intl.DateTimeFormat("en-CA", {
-  timeZone: STUDIO_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-});
-const monthKey = (date) => monthKeyFormat.format(date).slice(0, 7);
-
-const parseMonth = (key) => key.split("-").map(Number);
-
-const nextMonth = (key) => {
-  const [year, month] = parseMonth(key);
-  return month === 12
-    ? `${year + 1}-01`
-    : `${year}-${String(month + 1).padStart(2, "0")}`;
+const showLoadError = (error) => {
+  console.error(error);
+  currentEmpty.textContent = "Couldn't load statements. Please refresh.";
+  currentEmpty.hidden = false;
 };
 
-const monthLabel = (key) => {
-  const [year, month] = parseMonth(key);
-  return new Date(year, month - 1, 1).toLocaleDateString(undefined, {
-    month: "long",
-    year: "numeric",
-  });
-};
+const sumTotals = (invoices) =>
+  Math.round(invoices.reduce((sum, invoice) => sum + invoice.total * 100, 0)) / 100;
 
-// Every month from `first` to `last`, newest first.
-const monthsBetween = (first, last) => {
-  const months = [];
-  for (let key = first; key <= last; key = nextMonth(key)) months.push(key);
-  return months.reverse();
-};
+const memberCount = (count) => `${count} member${count === 1 ? "" : "s"}`;
 
-// Invoices -----------------------------------------------------------------
+// A member's own statements ------------------------------------------------
 
-// Fees are due on the 1st, so a month is billed at the tier in effect then,
-// or, in a month the membership starts, the tier it starts on. Periods come
-// from membership_periods, oldest first; none means no membership fee.
-const tierForMonth = (periods, month) => {
-  const firstDay = `${month}-01`;
-  const period =
-    periods.find(
-      (period) =>
-        period.starts_on <= firstDay && (!period.ends_on || period.ends_on >= firstDay),
-    ) ?? periods.find((period) => period.starts_on.startsWith(month));
-  return period && TIERS[period.tier];
-};
-
-const buildInvoices = (pieces, periods) => {
-  const piecesByMonth = new Map();
-  pieces.forEach((piece) => {
-    const month = monthKey(new Date(piece.bisque_fired_at));
-    piecesByMonth.set(month, [...(piecesByMonth.get(month) ?? []), piece]);
-  });
-  // From the first tier period or firing, whichever came first.
-  const first = [periods[0]?.starts_on.slice(0, 7), ...piecesByMonth.keys()]
-    .filter(Boolean)
-    .sort()[0];
-  if (!first) return [];
-
-  return monthsBetween(first, monthKey(new Date())).map((month) => {
-    const tier = tierForMonth(periods, month);
-    const lines = [
-      ...(tier ? [{ label: `Membership · ${tier.name}`, amount: tier.price }] : []),
-      ...(piecesByMonth.get(month) ?? []).map((piece) => {
-        const length = Number(piece.length_in);
-        const width = Number(piece.width_in);
-        const height = Number(piece.height_in);
-        return {
-          number: piece.piece_number,
-          label: piece.title,
-          detail: `Bisque + glaze firing · ${length} × ${width} × ${height} in · ${formatCubicInches(length, width, height)}`,
-          amount: firingCost(length, width, height),
-        };
-      }),
-    ];
-    const total = Math.round(lines.reduce((sum, line) => sum + line.amount * 100, 0)) / 100;
-    return { month, lines, total };
-  }).filter((invoice) => invoice.lines.length);
-};
-
-// The current month's statement is a running tally; past ones are final.
-const renderInvoice = ({ month, lines, total }, isCurrent) => {
-  const item = el(isCurrent ? "div" : "li", "invoice");
-
-  const heading = el("div", "invoice-heading");
-  heading.append(el("h3", null, monthLabel(month)));
-  if (isCurrent) heading.append(el("span", "invoice-tag", "In progress"));
-  item.append(heading);
-
-  const table = el("table", "invoice-lines");
-  const caption = el("caption", "visually-hidden", `Statement for ${monthLabel(month)}`);
-  const body = el("tbody");
-  lines.forEach((line) => {
-    const row = el("tr");
-    const description = el("th");
-    description.scope = "row";
-    if (line.number != null) {
-      description.append(el("span", "piece-number", formatPieceNumber(line.number)), " ");
-    }
-    description.append(line.label);
-    if (line.detail) description.append(el("span", "invoice-detail", line.detail));
-    row.append(description, el("td", null, formatMoney(line.amount)));
-    body.append(row);
-  });
-  const foot = el("tfoot");
-  const totalRow = el("tr");
-  const totalLabel = el("th", null, isCurrent ? "Total so far" : "Total");
-  totalLabel.scope = "row";
-  totalRow.append(totalLabel, el("td", null, formatMoney(total)));
-  foot.append(totalRow);
-  table.append(caption, body, foot);
-  item.append(table);
-
-  if (isCurrent) {
-    item.append(
-      el("p", "field-note", "Pieces fired later this month will be added here."),
-    );
-  }
-  return item;
-};
-
-const loadInvoices = async () => {
+const loadOwnInvoices = async (userId) => {
+  // Filter to this member: admins can read everyone's rows.
   const [{ data: pieces, error }, { data: periods, error: periodsError }] =
     await Promise.all([
-      supabase
-        .from("pieces")
-        .select("piece_number, title, length_in, width_in, height_in, bisque_fired_at")
-        .eq("status", "bisque_fired")
-        .not("bisque_fired_at", "is", null),
+      supabase.from("pieces").select(PIECE_COLUMNS).eq("user_id", userId),
       supabase
         .from("membership_periods")
-        .select("tier, starts_on, ends_on")
+        .select(PERIOD_COLUMNS)
+        .eq("user_id", userId)
         .order("starts_on"),
     ]);
+  if (error || periodsError) return showLoadError(error ?? periodsError);
 
-  invoicesView.hidden = false;
-  if (error || periodsError) {
-    console.error(error ?? periodsError);
-    currentEmpty.textContent = "Couldn't load your statements. Please refresh.";
-    currentEmpty.hidden = false;
-    return;
-  }
-
-  const thisMonth = monthKey(new Date());
-  const invoices = buildInvoices(pieces, periods);
-  const current = invoices.find((invoice) => invoice.month === thisMonth);
-  const past = invoices.filter((invoice) => invoice.month < thisMonth);
-
-  // Nothing to bill this month: no tier yet, or the membership has ended.
-  currentEmpty.textContent = "Nothing on this month's statement.";
-  currentEmpty.hidden = Boolean(current);
-  currentStatement.replaceChildren(...(current ? [renderInvoice(current, true)] : []));
-
-  pastEmpty.hidden = past.length > 0;
-  pastStatements.replaceChildren(...past.map((invoice) => renderInvoice(invoice, false)));
+  showStatements(pieces, periods, { current, currentEmpty, past, pastEmpty });
 };
 
-// Row-level security limits both queries to the member's own rows.
-requireMember(() => loadInvoices());
+// The studio's view: every member's statements -------------------------------
+
+const loadAllInvoices = async () => {
+  const [
+    { data: members, error: membersError },
+    { data: pieces, error: piecesError },
+    { data: periods, error: periodsError },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .eq("is_admin", false)
+      .order("full_name"),
+    supabase.from("pieces").select(`user_id, ${PIECE_COLUMNS}`),
+    supabase
+      .from("membership_periods")
+      .select(`user_id, ${PERIOD_COLUMNS}`)
+      .order("starts_on"),
+  ]);
+  const error = membersError ?? piecesError ?? periodsError;
+  if (error) return showLoadError(error);
+
+  // Every member's statements, keyed by month.
+  const byMonth = new Map();
+  members.forEach((member) => {
+    const invoices = buildInvoices(
+      pieces.filter((piece) => piece.user_id === member.id),
+      periods.filter((period) => period.user_id === member.id),
+    );
+    invoices.forEach((invoice) => {
+      byMonth.set(invoice.month, [...(byMonth.get(invoice.month) ?? []), { member, invoice }]);
+    });
+  });
+  const name = (member) => member.full_name || member.email;
+  const renderRows = (rows, isCurrent) => {
+    const list = el("ul", "invoice-list");
+    list.append(
+      ...rows.map(({ member, invoice }) => renderInvoice(invoice, isCurrent, name(member))),
+    );
+    return list;
+  };
+  const summary = (rows) =>
+    `${formatMoney(sumTotals(rows.map((row) => row.invoice)))} · ${memberCount(rows.length)}`;
+
+  const thisMonth = monthKey(new Date());
+  const currentRows = byMonth.get(thisMonth) ?? [];
+  currentEmpty.textContent = "Nothing billed this month yet.";
+  currentEmpty.hidden = currentRows.length > 0;
+  current.replaceChildren(
+    ...(currentRows.length
+      ? [
+          el("p", "member-total", `${monthLabel(thisMonth)} so far: ${summary(currentRows)}`),
+          renderRows(currentRows, true),
+        ]
+      : []),
+  );
+
+  // Past months, newest first, each one folded away.
+  const pastMonths = [...byMonth.keys()].filter((month) => month < thisMonth).sort().reverse();
+  pastEmpty.hidden = pastMonths.length > 0;
+  past.replaceChildren(
+    ...pastMonths.map((month) => {
+      const rows = byMonth.get(month);
+      const details = el("details", "invoice-month");
+      details.append(
+        el("summary", null, `${monthLabel(month)} · ${summary(rows)}`),
+        renderRows(rows, false),
+      );
+      const item = el("li");
+      item.append(details);
+      return item;
+    }),
+  );
+};
+
+requireMember(async (user) => {
+  const profile = await loadProfile(user.id);
+  invoicesView.hidden = false;
+  if (profile?.is_admin) {
+    document.querySelector("h1").textContent = "Member invoices";
+    intro.textContent =
+      "Each member's statement is their membership fee plus firing fees ($0.06 per cubic inch) for the pieces they logged that month.";
+    await loadAllInvoices();
+  } else {
+    await loadOwnInvoices(user.id);
+  }
+});
