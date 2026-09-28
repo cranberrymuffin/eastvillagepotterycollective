@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Members | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=13" />
+    <link rel="stylesheet" href="/style.css?v=14" />
   </head>
   <body>
     <main class="page membership-page">
@@ -33,13 +33,19 @@
                 <input type="text" name="full_name" autocomplete="off" maxlength="100" />
               </label>
               <p class="field-note">
-                They'll get an email invite to set a password. Their membership
-                starts today; if they joined earlier, edit it in their history
-                below.
+                This registers their email. They then create their account at
+                eastvillagepottery.com/members/ with that email and a password
+                of their choice. Only registered emails can sign up. Their
+                membership starts the day they sign up; if they joined earlier,
+                edit it in their history below.
               </p>
-              <button class="button" type="submit">Add member</button>
+              <button class="button" type="submit">Register member</button>
               <p class="form-status" role="status" aria-live="polite"></p>
             </form>
+
+            <h3 class="admin-subheading">Registered, not signed up yet</h3>
+            <p class="field-note" id="registrations-empty">No one is waiting to sign up.</p>
+            <ul class="registration-list" id="registration-list"></ul>
           </section>
 
           <section class="agreement-section" aria-labelledby="members-heading">
@@ -56,6 +62,6 @@
       </article>
     </main>
     <script type="module" src="/components/site-nav.js?v=4"></script>
-    <script type="module" src="/members/admin/admin.js?v=2"></script>
+    <script type="module" src="/members/admin/admin.js?v=3"></script>
   </body>
 </html>

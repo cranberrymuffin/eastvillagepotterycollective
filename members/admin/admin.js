@@ -1,4 +1,4 @@
-// Members page (studio admins only): add members, and view and edit each
+// Members page (studio admins only): register members, and view and edit each
 // member's tier history (membership_periods). The database only lets admins
 // make these changes; this page just hides itself from everyone else.
 import {
@@ -35,39 +35,92 @@ const periodErrorMessage = (error) => {
   return "Couldn't save. Please try again.";
 };
 
-// Adding a member --------------------------------------------------------------
+// Registering a member ---------------------------------------------------------
+// Registering an email lets that person create their own account on the
+// login page. The database refuses signups from unregistered emails.
 
-const ADD_ERRORS = {
-  email_exists: "There's already an account with that email.",
-  rate_limited:
-    "Too many invite emails were sent recently. Please wait a few minutes and try again.",
-  invalid_input: "Please enter a valid email and choose a tier.",
-  not_admin: "Only the studio account can add members.",
-};
+const registrationList = document.querySelector("#registration-list");
+const registrationsEmpty = document.querySelector("#registrations-empty");
 
 addForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const email = addForm.email.value.trim();
-  withForm(addForm, "Adding…", async () => {
-    const { error } = await supabase.functions.invoke("create-member", {
-      body: {
-        email,
-        tier: tierPicker.value,
-        full_name: addForm.full_name.value.trim(),
-      },
+  const email = addForm.email.value.trim().toLowerCase();
+  withForm(addForm, "Registering…", async () => {
+    // Admins can read every profile, so check for an existing account first.
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+    if (existing) {
+      setStatus(addForm, "There's already an account with that email.", true);
+      return;
+    }
+
+    const { error } = await supabase.from("member_registrations").insert({
+      email,
+      tier: tierPicker.value,
+      full_name: addForm.full_name.value.trim() || null,
     });
     if (error) {
-      // The function's JSON error code, when it sent one.
-      const code = await error.context?.json?.().then((body) => body.error).catch(() => null);
-      console.error(error, code);
-      setStatus(addForm, ADD_ERRORS[code] ?? "Couldn't add the member. Please try again.", true);
+      console.error(error);
+      setStatus(
+        addForm,
+        error.code === "23505"
+          ? "That email is already registered."
+          : "Couldn't register the member. Please try again.",
+        true,
+      );
       return;
     }
     addForm.reset();
-    setStatus(addForm, `Added ${email}. They'll get an email to set their password.`);
-    loadMembers();
+    setStatus(
+      addForm,
+      `Registered ${email}. They can now create their account at eastvillagepottery.com/members/.`,
+    );
+    loadRegistrations();
   });
 });
+
+async function loadRegistrations() {
+  const { data, error } = await supabase
+    .from("member_registrations")
+    .select("email, full_name, tier, registered_at")
+    .order("registered_at", { ascending: false });
+  if (error) {
+    console.error(error);
+    registrationsEmpty.textContent = "Couldn't load registrations. Please refresh.";
+    registrationsEmpty.hidden = false;
+    return;
+  }
+
+  registrationsEmpty.hidden = data.length > 0;
+  registrationList.replaceChildren(
+    ...data.map((registration) => {
+      const item = el("li", "registration");
+      const who = el("span", null, registration.full_name
+        ? `${registration.full_name} · ${registration.email}`
+        : registration.email);
+      const tier = el("span", "field-note", TIERS[registration.tier]?.name ?? "");
+      const remove = el("button", "link-button", "Remove");
+      remove.type = "button";
+      remove.addEventListener("click", async () => {
+        if (!window.confirm(`Remove the registration for ${registration.email}?`)) return;
+        const { error: removeError } = await supabase
+          .from("member_registrations")
+          .delete()
+          .eq("email", registration.email);
+        if (removeError) {
+          console.error(removeError);
+          window.alert("Couldn't remove it. Please try again.");
+        }
+        loadRegistrations();
+      });
+      item.append(who, tier, remove);
+      return item;
+    }),
+  );
+}
 
 // Membership -------------------------------------------------------------------
 // Each member shows their current tier with Change tier / End membership
@@ -399,5 +452,6 @@ requireMember(async (user) => {
     return;
   }
   adminView.hidden = false;
+  loadRegistrations();
   loadMembers();
 });
