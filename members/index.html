@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Members | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=13" />
+    <link rel="stylesheet" href="/style.css?v=14" />
   </head>
   <body>
     <main class="page membership-page">
@@ -60,8 +60,47 @@
             </p>
           </form>
           <p class="auth-switch">
-            New to the studio? The studio creates member accounts; you'll get
-            an email invite to set your password.
+            New member?
+            <button class="link-button" type="button" data-auth-view="signup">
+              Create your account
+            </button>
+          </p>
+        </section>
+
+        <section
+          class="agreement-section"
+          id="signup-view"
+          aria-labelledby="signup-heading"
+          hidden
+        >
+          <h2 id="signup-heading">Create your account</h2>
+          <p>
+            Use the email the studio registered for you. Not registered yet?
+            Ask the studio to add you.
+          </p>
+          <form class="member-form" id="signup-form">
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label class="field">
+              <span>Password (at least 8 characters)</span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              />
+            </label>
+            <button class="button" type="submit">Create account</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+          <p class="auth-switch">
+            Already have an account?
+            <button class="link-button" type="button" data-auth-view="login">
+              Log in
+            </button>
           </p>
         </section>
 
@@ -79,6 +118,6 @@
       </article>
     </main>
     <script type="module" src="/components/site-nav.js?v=4"></script>
-    <script type="module" src="/members/members.js?v=7"></script>
+    <script type="module" src="/members/members.js?v=8"></script>
   </body>
 </html>
