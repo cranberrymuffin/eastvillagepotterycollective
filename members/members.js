@@ -1,78 +1,41 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
+import {
+  supabase,
+  emailRedirectTo,
+  announceAuthChange,
+  showNotConfigured,
+  setStatus,
+  withForm,
+  authErrorMessage,
+} from "./shared.js";
+import { formatVolume, formatPieceNumber } from "./studio.js";
+import "./components/tier-picker.js";
+import "./components/payment-fields.js";
+import "./components/piece-fields.js";
 
 const BUCKET = "piece-photos";
 const MAX_PHOTOS = 4;
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
-const FIRING_RATE_PER_CUBIC_INCH = 0.06;
 
-const pageStatus = document.querySelector("#page-status");
 const loginView = document.querySelector("#login-view");
 const signupView = document.querySelector("#signup-view");
 const appView = document.querySelector("#app-view");
 const loginForm = document.querySelector("#login-form");
 const signupForm = document.querySelector("#signup-form");
+const signupPayment = signupForm.querySelector("payment-fields");
+const resendButton = document.querySelector("#resend-confirmation");
 const pieceForm = document.querySelector("#piece-form");
+const pieceFields = pieceForm.querySelector("piece-fields");
 const pieceList = document.querySelector("#piece-list");
 const piecesEmpty = document.querySelector("#pieces-empty");
-const volumeEstimate = document.querySelector("#volume-estimate");
 
-const setStatus = (form, message, isError = false) => {
-  const status = form.querySelector(".form-status");
-  status.textContent = message;
-  status.classList.toggle("is-error", isError);
-};
-
-const cubicInches = (length, width, height) => length * width * height;
-
-const formatVolume = (volume) =>
-  `${volume.toLocaleString(undefined, { maximumFractionDigits: 1 })} in³ · est. $${(
-    volume * FIRING_RATE_PER_CUBIC_INCH
-  ).toFixed(2)} to fire`;
-
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  pageStatus.textContent =
-    "Member login isn't set up yet. Please check back soon.";
-  pageStatus.hidden = false;
+if (!supabase) {
+  showNotConfigured();
   throw new Error("Supabase is not configured in /members/config.js");
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
 // Auth ---------------------------------------------------------------------
-
-const emailRedirectTo = `${window.location.origin}/members/`;
-const passwordView = document.querySelector("#password-view");
-const passwordForm = document.querySelector("#password-form");
-const resendButton = document.querySelector("#resend-confirmation");
-
-// Supabase's email sender is rate limited (one email per address per minute,
-// and a few per hour overall on the built-in mailer).
-const isRateLimited = (error) =>
-  error.status === 429 || error.code?.startsWith("over_");
-
-const authErrorMessage = (error) => {
-  if (isRateLimited(error)) {
-    return "Too many emails were requested. Please wait a minute and try again, and check your inbox for one we already sent.";
-  }
-  if (error.code === "weak_password") {
-    return "Please choose a stronger password.";
-  }
-  return "Something went wrong. Please try again.";
-};
-
-// Runs a Supabase call with the form's buttons disabled and reports errors.
-const withForm = async (form, pendingMessage, action) => {
-  const buttons = form.querySelectorAll("button");
-  buttons.forEach((button) => (button.disabled = true));
-  setStatus(form, pendingMessage);
-  try {
-    await action();
-  } finally {
-    buttons.forEach((button) => (button.disabled = false));
-  }
-};
 
 let authView = "login";
 
@@ -92,7 +55,6 @@ document.querySelectorAll("[data-auth-view]").forEach((button) => {
 const showSignedOut = () => {
   currentUser = null;
   appView.hidden = true;
-  passwordView.hidden = true;
   showAuthView(authView);
   pieceList.replaceChildren();
 };
@@ -100,28 +62,23 @@ const showSignedOut = () => {
 const showSignedIn = (user) => {
   if (currentUser?.id === user.id) return;
   currentUser = user;
-  document.querySelector("#member-name").textContent =
-    user.user_metadata?.full_name || user.email;
   loginView.hidden = true;
   signupView.hidden = true;
   appView.hidden = false;
   loadPieces();
 };
 
-const showPasswordForm = () => {
-  passwordForm.reset();
-  setStatus(passwordForm, "");
-  passwordView.hidden = false;
-  passwordForm.password.focus();
-};
-
 supabase.auth.onAuthStateChange((event, session) => {
   // Defer so Supabase calls made in response don't deadlock the auth lock.
   setTimeout(() => {
-    if (!session) return showSignedOut();
-    showSignedIn(session.user);
-    // Arrived from a "reset your password" email.
-    if (event === "PASSWORD_RECOVERY") showPasswordForm();
+    announceAuthChange();
+    // Arrived from a "reset your password" email: set it on My account.
+    if (event === "PASSWORD_RECOVERY") {
+      window.location.assign("/members/account/#password");
+      return;
+    }
+    if (session) showSignedIn(session.user);
+    else showSignedOut();
   });
 });
 
@@ -200,18 +157,6 @@ document.querySelector("#forgot-password").addEventListener("click", () => {
   });
 });
 
-const PAYMENT_HANDLE_LABELS = {
-  venmo: ["Venmo username", "@username"],
-  zelle: ["Zelle email or phone number", "you@example.com or 212-555-0123"],
-};
-
-signupForm.addEventListener("change", (event) => {
-  if (event.target.name !== "payment_method") return;
-  const [label, placeholder] = PAYMENT_HANDLE_LABELS[event.target.value];
-  document.querySelector("#payment-handle-label").textContent = label;
-  signupForm.payment_handle.placeholder = placeholder;
-});
-
 signupForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const data = new FormData(signupForm);
@@ -225,8 +170,8 @@ signupForm.addEventListener("submit", (event) => {
         data: {
           full_name: data.get("name").trim(),
           tier: data.get("tier"),
-          payment_method: data.get("payment_method"),
-          payment_handle: data.get("payment_handle").trim(),
+          payment_method: signupPayment.method,
+          payment_handle: signupPayment.handle,
         },
         emailRedirectTo,
       },
@@ -251,9 +196,7 @@ signupForm.addEventListener("submit", (event) => {
       );
     } else {
       signupForm.reset();
-      document.querySelector("#payment-handle-label").textContent =
-        "Venmo username or Zelle email/phone";
-      signupForm.payment_handle.placeholder = "";
+      signupPayment.reset();
       // With email confirmation off, signUp signs the member straight in and
       // onAuthStateChange shows the members area. If confirmation is ever
       // turned back on in Supabase, there's no session until they confirm.
@@ -267,59 +210,7 @@ signupForm.addEventListener("submit", (event) => {
   });
 });
 
-document
-  .querySelector("#show-password-form")
-  .addEventListener("click", showPasswordForm);
-
-document.querySelector("#cancel-password").addEventListener("click", () => {
-  passwordView.hidden = true;
-});
-
-passwordForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const data = new FormData(passwordForm);
-  if (data.get("password") !== data.get("confirm")) {
-    setStatus(passwordForm, "Passwords don't match.", true);
-    return;
-  }
-
-  withForm(passwordForm, "Saving…", async () => {
-    const { error } = await supabase.auth.updateUser({
-      password: data.get("password"),
-    });
-    if (error) {
-      console.error(error);
-      setStatus(
-        passwordForm,
-        error.code === "same_password"
-          ? "That's already your password. Choose a different one."
-          : authErrorMessage(error),
-        true,
-      );
-    } else {
-      passwordForm.reset();
-      setStatus(passwordForm, "Password saved. You can use it to log in next time.");
-    }
-  });
-});
-
-document.querySelector("#sign-out").addEventListener("click", () => {
-  supabase.auth.signOut();
-});
-
 // Submitting a piece -------------------------------------------------------
-
-// Read fields via FormData: form.title and form.length are built-in properties.
-const dimensions = (data) =>
-  ["length", "width", "height"].map((name) => Number(data.get(name)));
-
-pieceForm.addEventListener("input", () => {
-  const [length, width, height] = dimensions(new FormData(pieceForm));
-  volumeEstimate.textContent =
-    length && width && height
-      ? formatVolume(cubicInches(length, width, height))
-      : "";
-});
 
 pieceForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -355,20 +246,15 @@ pieceForm.addEventListener("submit", async (event) => {
       photoPaths.push(path);
     }
 
-    const [length, width, height] = dimensions(data);
     const { error } = await supabase.from("pieces").insert({
       id: pieceId,
-      title: data.get("title").trim(),
-      description: data.get("description").trim() || null,
-      length_in: length,
-      width_in: width,
-      height_in: height,
+      ...pieceFields.value,
       photo_paths: photoPaths,
     });
     if (error) throw error;
 
     pieceForm.reset();
-    volumeEstimate.textContent = "";
+    pieceFields.reset();
     setStatus(
       pieceForm,
       `Piece submitted ${new Date().toLocaleDateString(undefined, {
@@ -420,8 +306,15 @@ const renderPiece = (piece, photoUrls) => {
 
   const body = el("div", "piece-body");
   const heading = el("div", "piece-heading");
+  const title = el("div", "piece-title");
+  if (piece.piece_number != null) {
+    const number = el("span", "piece-number", formatPieceNumber(piece.piece_number));
+    number.title = "Piece number: write this on your shelf tag";
+    title.append(number);
+  }
+  title.append(el("h3", null, piece.title));
   heading.append(
-    el("h3", null, piece.title),
+    title,
     el("span", `piece-status status-${piece.status}`, STATUS_LABELS[piece.status]),
   );
   body.append(heading);
@@ -449,22 +342,72 @@ const renderPiece = (piece, photoUrls) => {
     el(
       "p",
       "piece-meta",
-      `${length} × ${width} × ${height} in · ${formatVolume(
-        cubicInches(length, width, height),
-      )}`,
+      `${length} × ${width} × ${height} in · ${formatVolume(length, width, height)}`,
     ),
   );
   if (piece.description) body.append(el("p", "piece-description", piece.description));
 
+  // Members can change or remove a piece until it's been fired.
   if (piece.status === "submitted") {
+    const actions = el("div", "piece-actions");
+    const edit = el("button", "button button-quiet", "Edit");
+    edit.type = "button";
+    edit.addEventListener("click", () => {
+      item.replaceChildren(renderEditForm(piece));
+      // <piece-fields> renders once it's in the page, so fill it after.
+      const fields = item.querySelector("piece-fields");
+      fields.value = piece;
+      fields.focus();
+    });
     const remove = el("button", "button button-quiet", "Remove");
     remove.type = "button";
     remove.addEventListener("click", () => deletePiece(piece));
-    body.append(remove);
+    actions.append(edit, remove);
+    body.append(actions);
   }
 
   item.append(body);
   return item;
+};
+
+const renderEditForm = (piece) => {
+  const form = el("form", "member-form piece-edit");
+  const heading = el("h3", null, "Edit ");
+  if (piece.piece_number != null) {
+    heading.append(el("span", "piece-number", formatPieceNumber(piece.piece_number)));
+  }
+  const fields = el("piece-fields");
+  const actions = el("div", "piece-actions");
+  const save = el("button", "button", "Save changes");
+  save.type = "submit";
+  const cancel = el("button", "button button-quiet", "Cancel");
+  cancel.type = "button";
+  cancel.addEventListener("click", () => loadPieces());
+  actions.append(save, cancel);
+  const status = el("p", "form-status");
+  status.setAttribute("role", "status");
+
+  form.append(heading, fields, actions, status);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    withForm(form, "Saving…", async () => {
+      const { error } = await supabase
+        .from("pieces")
+        .update(fields.value)
+        .eq("id", piece.id)
+        .select()
+        .single();
+      if (error) {
+        console.error(error);
+        setStatus(form, "Couldn't save your changes. Please try again.", true);
+      } else {
+        loadPieces();
+      }
+    });
+  });
+
+  return form;
 };
 
 async function loadPieces() {

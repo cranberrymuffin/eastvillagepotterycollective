@@ -621,12 +621,6 @@ piece-fields {
   font-size: 0.85rem;
 }
 
-.member-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 .choice-group {
   display: grid;
   gap: 0.6rem;
@@ -742,22 +736,6 @@ piece-fields {
   background: var(--paper);
 }
 
-.member-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1.25rem !important;
-  padding-bottom: 1.25rem !important;
-  background: var(--paper);
-}
-
-.member-bar p {
-  margin: 0 !important;
-  overflow-wrap: anywhere;
-}
-
 .piece-list {
   display: grid;
   gap: 1.5rem;
@@ -811,6 +789,44 @@ piece-fields {
   gap: 0.5rem;
 }
 
+.piece-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.piece-number {
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--clay-dark);
+  color: var(--clay-dark);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.piece-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.piece-edit {
+  max-width: none;
+}
+
+.piece-edit h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
 .piece-heading h3 {
   margin: 0;
   font-size: 1.25rem;
@@ -856,10 +872,6 @@ piece-fields {
   overflow-wrap: anywhere;
 }
 
-.piece .button-quiet {
-  justify-self: start;
-  margin-top: 0.25rem;
-}
 
 @media (max-width: 680px) {
   .page {
