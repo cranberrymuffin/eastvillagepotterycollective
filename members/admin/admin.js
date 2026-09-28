@@ -60,6 +60,7 @@ addForm.addEventListener("submit", (event) => {
     const { error } = await supabase.from("member_registrations").insert({
       email,
       tier: tierPicker.value,
+      starts_on: addForm.starts_on.value,
       full_name: addForm.full_name.value.trim() || null,
     });
     if (error) {
@@ -74,6 +75,7 @@ addForm.addEventListener("submit", (event) => {
       return;
     }
     addForm.reset();
+    addForm.starts_on.value = today();
     setStatus(
       addForm,
       `Registered ${email}. They can now create their account at eastvillagepottery.com/members/.`,
@@ -85,7 +87,7 @@ addForm.addEventListener("submit", (event) => {
 async function loadRegistrations() {
   const { data, error } = await supabase
     .from("member_registrations")
-    .select("email, full_name, tier, registered_at")
+    .select("email, full_name, tier, starts_on, registered_at")
     .order("registered_at", { ascending: false });
   if (error) {
     console.error(error);
@@ -101,7 +103,11 @@ async function loadRegistrations() {
       const who = el("span", null, registration.full_name
         ? `${registration.full_name} · ${registration.email}`
         : registration.email);
-      const tier = el("span", "field-note", TIERS[registration.tier]?.name ?? "");
+      const tier = el(
+        "span",
+        "field-note",
+        `${TIERS[registration.tier]?.name ?? ""} · starts ${formatPlainDate(registration.starts_on, "short")}`,
+      );
       const remove = el("button", "link-button", "Remove");
       remove.type = "button";
       remove.addEventListener("click", async () => {
@@ -457,6 +463,7 @@ requireMember(async (user) => {
     return;
   }
   adminView.hidden = false;
+  addForm.starts_on.value = today();
   loadRegistrations();
   loadMembers();
 });
