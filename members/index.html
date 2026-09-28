@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Members | East Village Pottery Collective</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css?v=11" />
+    <link rel="stylesheet" href="/style.css?v=12" />
   </head>
   <body>
     <main class="page membership-page">
@@ -60,58 +60,8 @@
             </p>
           </form>
           <p class="auth-switch">
-            New here?
-            <button class="link-button" type="button" data-auth-view="signup">
-              Create an account
-            </button>
-          </p>
-        </section>
-
-        <section
-          class="agreement-section"
-          id="signup-view"
-          aria-labelledby="signup-heading"
-          hidden
-        >
-          <h2 id="signup-heading">Create an account</h2>
-          <p>
-            Sign up to log your pieces for bisque firing.
-          </p>
-          <form class="member-form" id="signup-form">
-            <label class="field">
-              <span>Name</span>
-              <input
-                type="text"
-                name="name"
-                autocomplete="name"
-                maxlength="100"
-                required
-              />
-            </label>
-            <label class="field">
-              <span>Email</span>
-              <input type="email" name="email" autocomplete="email" required />
-            </label>
-            <label class="field">
-              <span>Password (at least 8 characters)</span>
-              <input
-                type="password"
-                name="password"
-                autocomplete="new-password"
-                minlength="8"
-                required
-              />
-            </label>
-            <tier-picker name="tier" required></tier-picker>
-            <payment-fields></payment-fields>
-            <button class="button" type="submit">Create account</button>
-            <p class="form-status" role="status" aria-live="polite"></p>
-          </form>
-          <p class="auth-switch">
-            Already have an account?
-            <button class="link-button" type="button" data-auth-view="login">
-              Log in
-            </button>
+            New to the studio? The studio creates member accounts; you'll get
+            an email invite to set your password.
           </p>
         </section>
 
@@ -128,7 +78,7 @@
         </div>
       </article>
     </main>
-    <script type="module" src="/components/site-nav.js?v=3"></script>
-    <script type="module" src="/members/members.js?v=6"></script>
+    <script type="module" src="/components/site-nav.js?v=4"></script>
+    <script type="module" src="/members/members.js?v=7"></script>
   </body>
 </html>

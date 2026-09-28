@@ -2,6 +2,10 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
 
+// Arrived from an invite email (an account the studio created). Read before
+// the Supabase client clears the link details from the URL.
+export const arrivedFromInvite = /[#&?]type=invite\b/.test(window.location.href);
+
 export const supabase =
   SUPABASE_URL && SUPABASE_ANON_KEY
     ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -20,6 +24,31 @@ export const showNotConfigured = () => {
   status.hidden = false;
 };
 
+// <site-nav> shows studio admins their admin links. Only changes which
+// links are shown; the database decides what an admin can do.
+const ADMIN_KEY = "evpc-studio-admin";
+
+export const isRememberedAdmin = () => {
+  try {
+    return localStorage.getItem(ADMIN_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+const rememberAdmin = (isAdmin) => {
+  try {
+    if (isAdmin === isRememberedAdmin()) return;
+    if (isAdmin) localStorage.setItem(ADMIN_KEY, "1");
+    else localStorage.removeItem(ADMIN_KEY);
+    announceAuthChange();
+  } catch {
+    // Storage blocked: the nav just shows member links.
+  }
+};
+
+export const forgetAdmin = () => rememberAdmin(false);
+
 // Loads the signed-in member's profile row (name, tier, payment details…).
 export const loadProfile = async (userId) => {
   const { data, error } = await supabase
@@ -28,6 +57,7 @@ export const loadProfile = async (userId) => {
     .eq("id", userId)
     .maybeSingle();
   if (error) console.error(error);
+  if (data) rememberAdmin(Boolean(data.is_admin));
   return data;
 };
 
@@ -46,6 +76,7 @@ export const isSessionGone = (error) => DEAD_SESSION_CODES.includes(error?.code)
 // Clears the dead login from this browser and returns to the login form.
 export const endStaleSession = async () => {
   await supabase.auth.signOut({ scope: "local" });
+  forgetAdmin();
   window.location.assign("/members/?expired");
 };
 

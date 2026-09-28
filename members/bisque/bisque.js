@@ -2,10 +2,11 @@ import {
   supabase,
   showNotConfigured,
   requireMember,
+  loadProfile,
   setStatus,
   withForm,
   el,
-} from "../shared.js?v=2";
+} from "../shared.js?v=3";
 import { formatVolume, formatPieceNumber } from "../studio.js?v=3";
 import "../components/piece-fields.js";
 
@@ -25,7 +26,12 @@ if (!supabase) {
 
 let currentUser = null;
 
-requireMember((user) => {
+requireMember(async (user) => {
+  // The studio account has no bisque log; it sees members' pieces on Invoices.
+  if ((await loadProfile(user.id))?.is_admin) {
+    window.location.replace("/members/invoices/");
+    return;
+  }
   currentUser = user;
   document.querySelector("#bisque-view").hidden = false;
   loadPieces();
@@ -225,9 +231,11 @@ const renderEditForm = (piece) => {
 };
 
 async function loadPieces() {
+  // Filter to this member: admins can read everyone's pieces.
   const { data: pieces, error } = await supabase
     .from("pieces")
     .select("*")
+    .eq("user_id", currentUser.id)
     .order("submitted_at", { ascending: false });
 
   if (error) {

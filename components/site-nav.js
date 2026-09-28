@@ -14,6 +14,17 @@ const sessionKey = SUPABASE_URL
   ? `sb-${new URL(SUPABASE_URL).hostname.split(".")[0]}-auth-token`
   : null;
 
+// Set by the members pages (members/shared.js) for studio admins.
+const ADMIN_KEY = "evpc-studio-admin";
+
+const isAdmin = () => {
+  try {
+    return localStorage.getItem(ADMIN_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 const isLoggedIn = () => {
   try {
     return Boolean(sessionKey && localStorage.getItem(sessionKey));
@@ -97,18 +108,29 @@ class SiteNav extends HTMLElement {
     signOut.textContent = "Sign out";
     signOut.addEventListener("click", async () => {
       // Loaded on demand so public pages don't pull in the Supabase library.
-      const { supabase } = await import("/members/shared.js?v=2");
+      const { supabase } = await import("/members/shared.js?v=3");
       // "local" ends only this browser's login, not the member's other devices.
       await supabase?.auth.signOut({ scope: "local" });
+      try {
+        localStorage.removeItem(ADMIN_KEY);
+      } catch {}
       window.location.assign("/members/");
     });
-    submenu.append(
-      makeLink(["/members/", "Home"]),
-      makeLink(["/members/bisque/", "Bisque log"]),
-      makeLink(["/members/invoices/", "Invoices"]),
-      makeLink(["/members/account/", "Account settings"]),
-      signOut,
-    );
+    // The studio account has no bisque log; it sees every member instead.
+    const links = isAdmin()
+      ? [
+          ["/members/", "Home"],
+          ["/members/invoices/", "Invoices"],
+          ["/members/admin/", "Members"],
+          ["/members/account/", "Account settings"],
+        ]
+      : [
+          ["/members/", "Home"],
+          ["/members/bisque/", "Bisque log"],
+          ["/members/invoices/", "Invoices"],
+          ["/members/account/", "Account settings"],
+        ];
+    submenu.append(...links.map(makeLink), signOut);
 
     menu.append(trigger, submenu);
     return menu;

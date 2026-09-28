@@ -10,9 +10,9 @@ import {
   isSessionGone,
   endStaleSession,
   verifySession,
-} from "../shared.js?v=2";
+} from "../shared.js?v=3";
 import { TIERS, formatPlainDate } from "../studio.js?v=3";
-import "../components/tier-picker.js";
+import "../components/tier-picker.js?v=2";
 import "../components/payment-fields.js";
 
 const accountView = document.querySelector("#account-view");
@@ -48,6 +48,7 @@ const loadTierHistory = async () => {
   const { data: periods, error } = await supabase
     .from("membership_periods")
     .select("tier, starts_on, ends_on")
+    .eq("user_id", user.id)
     .order("starts_on", { ascending: false });
   if (error) console.error(error);
 
@@ -86,7 +87,13 @@ const start = async (sessionUser) => {
   profile = (await loadProfile(user.id)) ?? { id: user.id };
   accountView.hidden = false;
   showProfile();
-  loadTierHistory();
+
+  // The studio account isn't a member: no pronouns, tier or payment.
+  const isAdmin = Boolean(profile.is_admin);
+  document.querySelector("#pronouns-field").hidden = isAdmin;
+  document.querySelector("#membership-section").hidden = isAdmin;
+  document.querySelector("#payment-section").hidden = isAdmin;
+  if (!isAdmin) loadTierHistory();
 
   // Arrived from a "reset your password" email.
   if (window.location.hash === "#password") {

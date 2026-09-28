@@ -1,8 +1,8 @@
 // <event-calendar>: the shared studio calendar. A month grid, the chosen
 // day's events with RSVPs, and a form to add or edit events.
 // Call start({ user, isAdmin }) once the member is logged in. Any member can
-// add events; only admins can post studio events. Creators and admins can
-// edit or delete an event.
+// add events; events added by a studio admin are studio events (set by the
+// database). Creators and admins can edit or delete an event.
 import {
   supabase,
   setStatus,
@@ -11,7 +11,7 @@ import {
   memberName,
   renderByline,
   el,
-} from "../shared.js?v=2";
+} from "../shared.js?v=3";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MAX_CHIPS = 2;
@@ -80,10 +80,6 @@ class EventCalendar extends HTMLElement {
           <span>Description</span>
           <textarea name="description" rows="3" maxlength="2000"></textarea>
         </label>
-        <label class="checkbox studio-event-option" hidden>
-          <input type="checkbox" name="is_studio_event" />
-          <span>Studio event (firings, closures, cleanup days…)</span>
-        </label>
         <div class="piece-actions">
           <button class="button" type="submit">Save event</button>
           <button class="button button-quiet" type="button" data-cancel>Cancel</button>
@@ -127,7 +123,6 @@ class EventCalendar extends HTMLElement {
 
   start(member) {
     this.#member = member;
-    this.querySelector(".studio-event-option").hidden = !member.isAdmin;
     this.load();
   }
 
@@ -329,7 +324,6 @@ class EventCalendar extends HTMLElement {
       form.start.value = timeValue(starts);
       form.end.value = event.ends_at ? timeValue(new Date(event.ends_at)) : "";
       form.description.value = event.description ?? "";
-      form.is_studio_event.checked = event.is_studio_event;
     } else {
       form.date.value = this.#selected;
       form.start.value = "18:00";
@@ -362,7 +356,6 @@ class EventCalendar extends HTMLElement {
       description: form.description.value.trim() || null,
       starts_at: starts.toISOString(),
       ends_at: ends?.toISOString() ?? null,
-      is_studio_event: this.#member.isAdmin && form.is_studio_event.checked,
     };
 
     withForm(form, "Saving…", async () => {

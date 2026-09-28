@@ -986,6 +986,99 @@ piece-fields {
   font-size: 0.78rem;
 }
 
+.field select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fffaf2;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.member-total {
+  color: var(--clay-dark) !important;
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.9rem !important;
+  font-weight: 700;
+}
+
+.invoice-month,
+.admin-member {
+  border-left: 3px solid var(--peach);
+  background: rgba(228, 212, 187, 0.3);
+}
+
+.invoice-month > summary,
+.admin-member > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  font-family: "Trebuchet MS", sans-serif;
+}
+
+.invoice-month > .invoice-list {
+  padding: 0 1rem 1rem !important;
+}
+
+.admin-member-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.admin-member-meta {
+  color: var(--clay-dark);
+  font-size: 0.85rem;
+}
+
+.admin-member-body {
+  display: grid;
+  gap: 1rem;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.admin-member-body h3 {
+  margin: 0.5rem 0 0;
+  color: var(--clay-dark);
+  font-family: "Trebuchet MS", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.period-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.period-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  align-items: end;
+  padding: 0.9rem;
+  background: rgba(248, 241, 230, 0.7);
+}
+
+.period-form .field span {
+  font-size: 0.7rem;
+}
+
+.period-form .piece-actions,
+.period-form .form-status {
+  grid-column: 1 / -1;
+}
+
 /* Members home: posts */
 
 .byline {
@@ -1374,6 +1467,9 @@ piece-fields {
     gap: 0.5rem;
   }
   .piece {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .period-form {
     grid-template-columns: minmax(0, 1fr);
   }
   .calendar-month {

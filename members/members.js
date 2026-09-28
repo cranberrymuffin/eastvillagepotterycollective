@@ -8,18 +8,15 @@ import {
   withForm,
   authErrorMessage,
   verifySession,
-} from "./shared.js?v=2";
-import "./components/tier-picker.js";
-import "./components/payment-fields.js";
+  arrivedFromInvite,
+  forgetAdmin,
+} from "./shared.js?v=3";
 import "./components/member-feed.js?v=2";
-import "./components/event-calendar.js?v=2";
+import "./components/event-calendar.js?v=3";
 
 const loginView = document.querySelector("#login-view");
-const signupView = document.querySelector("#signup-view");
 const appView = document.querySelector("#app-view");
 const loginForm = document.querySelector("#login-form");
-const signupForm = document.querySelector("#signup-form");
-const signupPayment = signupForm.querySelector("payment-fields");
 const resendButton = document.querySelector("#resend-confirmation");
 
 if (!supabase) {
@@ -31,31 +28,17 @@ let currentUser = null;
 
 // Auth ---------------------------------------------------------------------
 
-let authView = "login";
-
 // Sent back here after a login that had ended elsewhere.
 if (new URLSearchParams(window.location.search).has("expired")) {
   setStatus(loginForm, "Your session expired. Please log in again.");
   history.replaceState(null, "", window.location.pathname);
 }
 
-const showAuthView = (view) => {
-  authView = view;
-  loginView.hidden = view !== "login";
-  signupView.hidden = view !== "signup";
-};
-
-document.querySelectorAll("[data-auth-view]").forEach((button) => {
-  button.addEventListener("click", () => {
-    showAuthView(button.dataset.authView);
-    (authView === "login" ? loginForm : signupForm).querySelector("input").focus();
-  });
-});
-
 const showSignedOut = () => {
   currentUser = null;
+  forgetAdmin();
   appView.hidden = true;
-  showAuthView(authView);
+  loginView.hidden = false;
 };
 
 const showSignedIn = async (user) => {
@@ -63,7 +46,6 @@ const showSignedIn = async (user) => {
   currentUser = user;
   if (!(await verifySession())) return;
   loginView.hidden = true;
-  signupView.hidden = true;
   appView.hidden = false;
 
   // The home page: shared calendar and posts.
@@ -79,6 +61,11 @@ supabase.auth.onAuthStateChange((event, session) => {
     announceAuthChange();
     // Arrived from a "reset your password" email: set it on My account.
     if (event === "PASSWORD_RECOVERY") {
+      window.location.assign("/members/account/#password");
+      return;
+    }
+    // Invited by the studio: choose a password first.
+    if (session && arrivedFromInvite) {
       window.location.assign("/members/account/#password");
       return;
     }
@@ -157,59 +144,6 @@ document.querySelector("#forgot-password").addEventListener("click", () => {
       setStatus(
         loginForm,
         "If there's an account for that email, we've sent a link to set a new password.",
-      );
-    }
-  });
-});
-
-signupForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const data = new FormData(signupForm);
-
-  withForm(signupForm, "Creating your account…", async () => {
-    const { data: result, error } = await supabase.auth.signUp({
-      email: data.get("email").trim(),
-      password: data.get("password"),
-      options: {
-        // Copied into public.profiles by the on_auth_user_created trigger.
-        data: {
-          full_name: data.get("name").trim(),
-          tier: data.get("tier"),
-          payment_method: signupPayment.method,
-          payment_handle: signupPayment.handle,
-        },
-        emailRedirectTo,
-      },
-    });
-
-    if (error) {
-      console.error(error);
-      setStatus(
-        signupForm,
-        error.code === "user_already_exists"
-          ? "An account with that email already exists. Log in instead."
-          : authErrorMessage(error),
-        true,
-      );
-    } else if (result.user?.identities?.length === 0) {
-      // Supabase hides whether an email is registered by returning a user
-      // with no identities instead of an error.
-      setStatus(
-        signupForm,
-        "An account with that email already exists. Log in instead.",
-        true,
-      );
-    } else {
-      signupForm.reset();
-      signupPayment.reset();
-      // With email confirmation off, signUp signs the member straight in and
-      // onAuthStateChange shows the members area. If confirmation is ever
-      // turned back on in Supabase, there's no session until they confirm.
-      setStatus(
-        signupForm,
-        result.session
-          ? "Account created."
-          : "Almost done! Check your email and click the link to confirm your account.",
       );
     }
   });

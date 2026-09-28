@@ -9,7 +9,7 @@ import {
   formatWhen,
   renderByline,
   el,
-} from "../shared.js?v=2";
+} from "../shared.js?v=3";
 
 const PAGE_SIZE = 50;
 
