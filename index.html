@@ -36,25 +36,7 @@
   </head>
   <body>
     <main class="page">
-      <nav class="site-nav" aria-label="Main navigation">
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-expanded="false"
-          aria-controls="nav-links"
-        >
-          <span class="menu-icon" aria-hidden="true"
-            ><span></span><span></span><span></span
-          ></span>
-          Menu
-        </button>
-        <div class="nav-links">
-          <a href="/" aria-current="page">Home</a>
-          <a href="/about/">About</a>
-          <a href="/membership/">Membership</a>
-          <a href="/members/">Login</a>
-        </div>
-      </nav>
+      <site-nav></site-nav>
       <section
         class="contact-card"
         aria-label="East Village Pottery Collective"
@@ -128,6 +110,6 @@
         "areaServed": "East Village, New York City"
       }
     </script>
-    <script src="script.js?v=2" defer></script>
+    <script type="module" src="/components/site-nav.js?v=1"></script>
   </body>
 </html>

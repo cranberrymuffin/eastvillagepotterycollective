@@ -10,25 +10,7 @@
   </head>
   <body>
     <main class="page membership-page">
-      <nav class="site-nav" aria-label="Main navigation">
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-expanded="false"
-          aria-controls="nav-links"
-        >
-          <span class="menu-icon" aria-hidden="true"
-            ><span></span><span></span><span></span
-          ></span>
-          Menu
-        </button>
-        <div class="nav-links">
-          <a href="/">Home</a>
-          <a href="/about/">About</a>
-          <a href="/membership/">Membership</a>
-          <a href="/members/" aria-current="page">Login</a>
-        </div>
-      </nav>
+      <site-nav></site-nav>
       <article class="membership-card">
         <header class="membership-header">
           <p class="contact-label">East Village Pottery Collective</p>
@@ -316,7 +298,7 @@
         </div>
       </article>
     </main>
-    <script src="/script.js?v=2" defer></script>
-    <script type="module" src="/members/members.js?v=1"></script>
+    <script type="module" src="/components/site-nav.js?v=1"></script>
+    <script type="module" src="/members/members.js?v=3"></script>
   </body>
 </html>
